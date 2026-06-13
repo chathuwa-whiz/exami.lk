@@ -89,272 +89,180 @@ render_header('My Profile');
 <?php if ($errors): ?>
   <div class="alert alert-danger" role="alert">
     <?php foreach ($errors as $error): ?>
-      <div><?= htmlspecialchars($error) ?></div>
+      <div><i class="bi bi-exclamation-triangle-fill me-1"></i><?= htmlspecialchars($error) ?></div>
     <?php endforeach; ?>
   </div>
 <?php endif; ?>
-
 <?php if ($success): ?>
-  <div class="alert alert-success" role="alert">
-    <?= htmlspecialchars($success) ?>
-  </div>
+  <div class="alert alert-success" role="status"><i class="bi bi-check-circle-fill me-1"></i><?= htmlspecialchars($success) ?></div>
 <?php endif; ?>
 
-<!-- Hero Header Section -->
-<section class="mb-4 mb-md-5" style="background: white; border-radius: 12px; padding: 2rem; border-left: 4px solid #3b82f6; position: relative; overflow: hidden;">
-  <div class="position-relative">
-    <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-3 mb-3">
-      <div style="position: relative; width: 80px; height: 80px; min-width: 80px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 2rem; overflow: hidden; cursor: pointer;" id="profileImageContainer" title="Click to upload profile image">
+<!-- Profile Header -->
+<div class="app-card mb-4">
+  <div class="app-card-body">
+    <div class="d-flex align-items-center gap-4 flex-wrap">
+      <!-- Avatar -->
+      <div id="profileImageContainer" title="Click to upload photo"
+           style="position:relative;width:80px;height:80px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:#fff;overflow:hidden;cursor:pointer;flex-shrink:0;border:3px solid var(--primary-border);">
         <?php if (!empty($teacher['profile_image'])): ?>
-          <img id="profileImage" src="<?= app_href($teacher['profile_image'] . '?t=' . time()) ?>" style="width: 100%; height: 100%; object-fit: cover;" alt="Profile Image">
+          <img id="profileImage" src="<?= app_href($teacher['profile_image'] . '?t=' . time()) ?>" style="width:100%;height:100%;object-fit:cover;" alt="Photo">
         <?php else: ?>
-          <i class="bi bi-person-workspace" style="color: #6b7280;"></i>
+          <span><?= strtoupper(substr($teacher['name'], 0, 1)) ?></span>
         <?php endif; ?>
-        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+        <input type="file" id="imageInput" accept="image/*" style="display:none;">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;" class="image-overlay">
+          <i class="bi bi-cloud-upload text-white" style="font-size:1.4rem;"></i>
+        </div>
       </div>
+      <!-- Info -->
       <div class="flex-grow-1">
-        <h1 class="mb-2" style="font-size: 2.5rem; font-weight: 700; color: #1f2937;"><?= htmlspecialchars($teacher['name']) ?></h1>
-        <p class="mb-0 small" style="color: #6b7280;"><i class="bi bi-envelope me-1"></i><?= htmlspecialchars($teacher['email']) ?></p>
-      </div>
-    </div>
-    
-    <!-- Subjects in Hero Section -->
-    <div class="mt-3 pt-3" style="border-top: 1px solid #e5e7eb;">
-      <h5 class="mb-3" style="color: #1f2937;"><i class="bi bi-book-half me-2"></i>Your Subjects</h5>
-      <?php if (empty($subjects)): ?>
-        <p class="small mb-0" style="color: #6b7280;">No subjects assigned yet.</p>
-      <?php else: ?>
-        <div class="d-flex flex-wrap gap-2">
-          <?php foreach ($subjects as $s): ?>
-            <span class="badge" style="background: #f3f4f6; color: #374151;"><?= htmlspecialchars($s['name']) ?></span>
-          <?php endforeach; ?>
-        </div>
-      <?php endif; ?>
-    </div>
-  </div>
-</section>
-
-<!-- Profile Completion -->
-<?php
-$completionFields = [
-  'first_name' => $teacher['first_name'] ?? '',
-  'second_name' => $teacher['second_name'] ?? '',
-  'birth_date' => $teacher['birth_date'] ?? '',
-  'sexuality' => $teacher['sexuality'] ?? '',
-  'nic_no' => $teacher['nic_no'] ?? '',
-  'school_name' => $teacher['school_name'] ?? '',
-  'grade' => $teacher['grade'] ?? '',
-  'school_category' => $teacher['school_category'] ?? '',
-  'main_subject' => $teacher['main_subject'] ?? '',
-  'first_appointment_date' => $teacher['first_appointment_date'] ?? '',
-  'profile_image' => $teacher['profile_image'] ?? ''
-];
-$filledFields = count(array_filter($completionFields, fn($v) => !empty($v)));
-$totalFields = count($completionFields);
-$completionPercentage = round(($filledFields / $totalFields) * 100);
-$bgColor = $completionPercentage >= 80 ? '#dcfce7' : '#fef3c7';
-$borderColor = $completionPercentage >= 80 ? '#10b981' : '#f59e0b';
-$textColor = $completionPercentage >= 80 ? '#166534' : '#92400e';
-?>
-<section class="mb-4">
-  <div class="card" style="border-radius: 12px; border: 1px solid #e5e7eb; border-bottom: 3px solid <?= $borderColor ?>; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-    <div class="card-body p-4">
-      <div class="d-flex align-items-center gap-3">
-        <div style="width: 60px; height: 60px; min-width: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: <?= $bgColor ?>; color: <?= $textColor ?>;">
-          <i class="bi bi-<?= $completionPercentage >= 80 ? 'check-circle-fill' : 'info-circle-fill' ?>"></i>
-        </div>
-        <div class="flex-grow-1">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h5 class="mb-0 fw-bold" style="color: #1f2937;"><?= htmlspecialchars($teacher['name']) ?></h5>
-            <span class="badge" style="background: <?= $bgColor ?>; color: <?= $textColor ?>; font-size: 0.9rem; padding: 0.4rem 0.8rem;"><?= $completionPercentage ?>%</span>
+        <h1 class="page-title mb-0"><?= htmlspecialchars($teacher['name']) ?></h1>
+        <p class="mb-2" style="font-size:13px;color:var(--muted);"><i class="bi bi-envelope me-1"></i><?= htmlspecialchars($teacher['email']) ?></p>
+        <?php
+          $completionFields = [
+            'first_name' => $teacher['first_name'] ?? '', 'second_name' => $teacher['second_name'] ?? '',
+            'birth_date' => $teacher['birth_date'] ?? '', 'sexuality' => $teacher['sexuality'] ?? '',
+            'nic_no' => $teacher['nic_no'] ?? '', 'school_name' => $teacher['school_name'] ?? '',
+            'grade' => $teacher['grade'] ?? '', 'school_category' => $teacher['school_category'] ?? '',
+            'main_subject' => $teacher['main_subject'] ?? '', 'first_appointment_date' => $teacher['first_appointment_date'] ?? '',
+            'profile_image' => $teacher['profile_image'] ?? ''
+          ];
+          $filledFields = count(array_filter($completionFields, fn($v) => !empty($v)));
+          $completionPercentage = round(($filledFields / count($completionFields)) * 100);
+          $barColor = $completionPercentage >= 80 ? 'var(--success)' : 'var(--warning)';
+        ?>
+        <div class="d-flex align-items-center gap-3">
+          <div class="flex-grow-1" style="background:var(--border);border-radius:999px;height:6px;overflow:hidden;">
+            <div style="width:<?= $completionPercentage ?>%;background:<?= $barColor ?>;height:100%;border-radius:999px;transition:width 0.6s ease;"></div>
           </div>
-          <p class="mb-2 small" style="color: #6b7280;">Teacher Profile</p>
-          <?php if ($completionPercentage < 100): ?>
-            <a href="#profileForm" class="text-decoration-none fw-semibold" style="color: <?= $borderColor ?>; font-size: 0.9rem;">
-              <i class="bi bi-pencil-square me-1"></i>Complete your profile
-            </a>
-          <?php else: ?>
-            <p class="mb-0 small" style="color: #10b981;"><i class="bi bi-check-circle-fill me-1"></i>Profile completed</p>
-          <?php endif; ?>
-          <div class="progress mt-3" style="height: 8px; border-radius: 10px; background: #e5e7eb;">
-            <div class="progress-bar" role="progressbar" style="width: <?= $completionPercentage ?>%; background: <?= $borderColor ?>; border-radius: 10px;" aria-valuenow="<?= $completionPercentage ?>" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
+          <span class="badge-soft <?= $completionPercentage >= 80 ? 'badge-soft-success' : 'badge-soft-warning' ?>"><?= $completionPercentage ?>% complete</span>
         </div>
+        <?php if ($completionPercentage < 100): ?>
+          <a href="#profileForm" class="text-decoration-none" style="font-size:12.5px;color:var(--primary);font-weight:600;"><i class="bi bi-pencil-square me-1"></i>Complete your profile</a>
+        <?php else: ?>
+          <span style="font-size:12.5px;color:var(--success);font-weight:600;"><i class="bi bi-check-circle-fill me-1"></i>Profile completed!</span>
+        <?php endif; ?>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- Profile Info Cards -->
-<section class="mb-4 mb-md-5">
-  <div class="row g-3">
-    <!-- Teacher Code Card -->
-    <div class="col-12 col-sm-6 col-lg-4">
-      <div class="card" style="border: 1px solid #e5e7eb; border-left: 4px solid #3b82f6; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-        <div class="card-body p-3 p-md-4">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <div style="width: 40px; height: 40px; min-width: 40px; border-radius: 10px; background: #dbeafe; display: flex; align-items: center; justify-content: center; color: #3b82f6; font-size: 1.2rem;">
-              <i class="bi bi-key-fill"></i>
-            </div>
-          </div>
-          <p class="text-uppercase small" style="color: #6b7280; letter-spacing: 0.05em; font-weight: 600; font-size: 0.75rem; margin-bottom: 0.5rem;">Teacher Code</p>
-          <h3 class="mb-2" style="font-family: 'Courier New', monospace; font-size: clamp(1.3rem, 4vw, 1.8rem); font-weight: 700; color: #3b82f6; word-break: break-all;">
-            <?= htmlspecialchars($teacher['teacher_code'] ?? 'N/A') ?>
-          </h3>
-          <p class="mb-3" style="color: #6b7280; font-size: 0.85rem;">Share this code with students</p>
-          <button class="btn btn-sm btn-outline-primary w-100" onclick="copyToClipboard('<?= htmlspecialchars($teacher['teacher_code'] ?? '') ?>')">
-            <i class="bi bi-files"></i> Copy Code
-          </button>
-        </div>
-      </div>
+<!-- Stat Cards -->
+<div class="stat-cards">
+  <div class="stat-card">
+    <div class="stat-card-icon blue"><i class="bi bi-key-fill"></i></div>
+    <div>
+      <p class="stat-card-label">Teacher Code</p>
+      <p class="stat-card-value" style="font-size:18px;letter-spacing:0.06em;"><?= htmlspecialchars($teacher['teacher_code'] ?? 'N/A') ?></p>
+      <button class="btn btn-outline-primary btn-sm mt-1" onclick="copyToClipboard('<?= htmlspecialchars($teacher['teacher_code'] ?? '') ?>')"><i class="bi bi-files"></i> Copy</button>
     </div>
-
-    <!-- Account Created Card -->
-    <div class="col-12 col-sm-6 col-lg-4">
-      <div class="card" style="border: 1px solid #e5e7eb; border-bottom: 3px solid #9ca3af; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-        <div class="card-body p-3 p-md-4">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <div style="width: 40px; height: 40px; min-width: 40px; border-radius: 10px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 1.2rem;">
-              <i class="bi bi-calendar-event-fill"></i>
-            </div>
-          </div>
-          <p class="text-uppercase small" style="color: #6b7280; letter-spacing: 0.05em; font-weight: 600; font-size: 0.75rem; margin-bottom: 0.5rem;">Member Since</p>
-          <h3 class="mb-2" style="font-size: clamp(1.3rem, 4vw, 1.8rem); font-weight: 700; color: #1f2937;">
-            <?= htmlspecialchars(date('M d, Y', strtotime($teacher['created_at']))) ?>
-          </h3>
-          <p style="color: #6b7280; font-size: 0.85rem;">
-            <i class="bi bi-clock-history"></i> 
-            Joined <?= htmlspecialchars(date('F Y', strtotime($teacher['created_at']))) ?>
-          </p>
-        </div>
-      </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-icon gray"><i class="bi bi-calendar-event-fill"></i></div>
+    <div>
+      <p class="stat-card-label">Member Since</p>
+      <p class="stat-card-value" style="font-size:18px;"><?= htmlspecialchars(date('M Y', strtotime($teacher['created_at']))) ?></p>
+      <p class="stat-card-sub"><?= htmlspecialchars(date('d M Y', strtotime($teacher['created_at']))) ?></p>
     </div>
-
-    <!-- Subjects Count Card -->
-    <div class="col-12 col-sm-6 col-lg-4">
-      <div class="card" style="border: 1px solid #e5e7eb; border-bottom: 3px solid #3b82f6; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-        <div class="card-body p-3 p-md-4">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <div style="width: 40px; height: 40px; min-width: 40px; border-radius: 10px; background: #dbeafe; display: flex; align-items: center; justify-content: center; color: #3b82f6; font-size: 1.2rem;">
-              <i class="bi bi-book-fill"></i>
-            </div>
-          </div>
-          <p class="text-uppercase small" style="color: #6b7280; letter-spacing: 0.05em; font-weight: 600; font-size: 0.75rem; margin-bottom: 0.5rem;">Subjects</p>
-          <h3 class="mb-2" style="font-size: clamp(1.3rem, 4vw, 1.8rem); font-weight: 700; color: #3b82f6;">
-            <?= count($subjects) ?>
-          </h3>
-          <p style="color: #6b7280; font-size: 0.85rem;">
-            <i class="bi bi-check-circle-fill" style="color: #3b82f6;"></i> 
-            <?= count($subjects) === 1 ? 'Subject' : 'Subjects' ?> assigned
-          </p>
-        </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-icon blue"><i class="bi bi-book-fill"></i></div>
+    <div>
+      <p class="stat-card-label">Subjects</p>
+      <p class="stat-card-value"><?= count($subjects) ?></p>
+      <div class="d-flex flex-wrap gap-1 mt-1">
+        <?php foreach ($subjects as $s): ?>
+          <span class="badge-soft badge-soft-primary" style="font-size:10px;"><?= htmlspecialchars($s['name']) ?></span>
+        <?php endforeach; ?>
+        <?php if (empty($subjects)): ?>
+          <span class="stat-card-sub">No subjects yet</span>
+        <?php endif; ?>
       </div>
     </div>
   </div>
-</section>
-
-<!-- Profile Details Form -->
-<section class="mb-4 mb-md-5" id="profileForm">
-  <div class="card shadow-sm" style="border-radius: 12px; border: none;">
-    <div class=\"card-header\" style=\"background: white; border-bottom: 2px solid #3b82f6; border-radius: 12px 12px 0 0; padding: 1rem 1.5rem;\">\n      <h5 class=\"mb-0 h6 h5-md\" style=\"color: #1f2937;\"><i class=\"bi bi-person-lines-fill me-2\"></i>Profile Information</h5>\n    </div>
-    <div class="card-body p-3 p-md-4">
-      <form method="POST">
-        <?= csrf_field() ?>
-        
-        <h6 class="fw-bold mb-3 text-muted" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;"><i class="bi bi-person me-2"></i>Personal Information</h6>
-        <div class="row g-3 mb-4">
-          <div class="col-12 col-md-6">
-            <label class="form-label fw-semibold small">First Name</label>
-            <input type="text" name="first_name" class="form-control" value="<?= htmlspecialchars($teacher['first_name'] ?? '') ?>" placeholder="Enter first name">
-          </div>
-          
-          <div class="col-12 col-md-6">
-            <label class="form-label fw-semibold small">Second Name</label>
-            <input type="text" name="second_name" class="form-control" value="<?= htmlspecialchars($teacher['second_name'] ?? '') ?>" placeholder="Enter second name">
-          </div>
-          
-          <div class="col-12 col-md-6">
-            <label class="form-label fw-semibold small">Birth Date</label>
-            <input type="date" name="birth_date" class="form-control" value="<?= htmlspecialchars($teacher['birth_date'] ?? '') ?>">
-          </div>
-          
-          <div class="col-12 col-md-6">
-            <label class="form-label fw-semibold small">Gender</label>
-            <select name="sexuality" class="form-select">
-              <option value="">Select Gender</option>
-              <option value="Male" <?= ($teacher['sexuality'] ?? '') == 'Male' ? 'selected' : '' ?>>Male</option>
-              <option value="Female" <?= ($teacher['sexuality'] ?? '') == 'Female' ? 'selected' : '' ?>>Female</option>
-              <option value="Other" <?= ($teacher['sexuality'] ?? '') == 'Other' ? 'selected' : '' ?>>Other</option>
-            </select>
-          </div>
-          
-          <div class="col-12">
-            <label class="form-label fw-semibold small">NIC Number</label>
-            <input type="text" name="nic_no" class="form-control" value="<?= htmlspecialchars($teacher['nic_no'] ?? '') ?>" placeholder="Enter NIC number">
-          </div>
-        </div>
-
-        <hr class="my-4">
-        
-        <h6 class="fw-bold mb-3 text-muted" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;"><i class="bi bi-briefcase me-2"></i>Professional Details</h6>
-        <div class="row g-3">
-          <div class="col-12">
-            <label class="form-label fw-semibold small">School Name</label>
-            <input type="text" name="school_name" class="form-control" value="<?= htmlspecialchars($teacher['school_name'] ?? '') ?>" placeholder="Enter school name">
-          </div>
-          
-          <div class="col-12 col-md-6">
-            <label class="form-label fw-semibold small">School Category</label>
-            <select name="school_category" class="form-select">
-              <option value="">Select Category</option>
-              <option value="Government" <?= ($teacher['school_category'] ?? '') == 'Government' ? 'selected' : '' ?>>Government</option>
-              <option value="Private" <?= ($teacher['school_category'] ?? '') == 'Private' ? 'selected' : '' ?>>Private</option>
-            </select>
-          </div>
-          
-          <div class="col-12 col-md-6">
-            <label class="form-label fw-semibold small">Grade</label>
-            <input type="text" name="grade" class="form-control" placeholder="e.g., Grade 10, 11" value="<?= htmlspecialchars($teacher['grade'] ?? '') ?>">
-          </div>
-          
-          <div class="col-12 col-md-6">
-            <label class="form-label fw-semibold small">Main Subject</label>
-            <input type="text" name="main_subject" class="form-control" value="<?= htmlspecialchars($teacher['main_subject'] ?? '') ?>" placeholder="Enter main subject">
-          </div>
-          
-          <div class="col-12 col-md-6">
-            <label class="form-label fw-semibold small">First Appointment Date</label>
-            <input type="date" name="first_appointment_date" class="form-control" value="<?= htmlspecialchars($teacher['first_appointment_date'] ?? '') ?>">
-          </div>
-        </div>
-
-        <div class="mt-4 d-grid d-sm-block">
-          <button type="submit" name="update_profile" class="btn btn-primary px-4 py-2">
-            <i class="bi bi-check-circle me-2"></i>Save Changes
-          </button>
-        </div>
-      </form>
+  <div class="stat-card">
+    <div class="stat-card-icon green"><i class="bi bi-journal-text"></i></div>
+    <div>
+      <p class="stat-card-label">Papers</p>
+      <p class="stat-card-value"><?= (int)($paperStats['total'] ?? 0) ?></p>
+      <p class="stat-card-sub"><?= (int)($paperStats['published'] ?? 0) ?> published</p>
     </div>
   </div>
-</section>
+</div>
 
-<!-- Action Buttons Section -->
-<section class="mt-4 mb-4">
-  <div class="row g-2 g-md-3">
-    <div class="col-12 col-sm-6">
-      <a class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center gap-2" style="font-weight: 600; padding: 0.875rem 1.5rem;" href="<?= htmlspecialchars(app_href('teacher/manage_papers.php')) ?>">
-        <i class="bi bi-plus-circle-fill"></i> 
-        <span>Manage Papers</span>
-      </a>
-    </div>
-    <div class="col-12 col-sm-6">
-      <a class="btn btn-lg btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" style="font-weight: 600; padding: 0.875rem 1.5rem;" href="<?= htmlspecialchars(app_href('teacher/manage_papers.php')) ?>">
-        <i class="bi bi-files-fill"></i> 
-        <span>View My Papers</span>
-      </a>
-    </div>
+<!-- Profile Form -->
+<div class="app-card" id="profileForm">
+  <div class="app-card-header">
+    <h2 class="app-card-title"><i class="bi bi-person-lines-fill text-primary"></i> Profile Details</h2>
   </div>
-</section>
+  <div class="app-card-body">
+    <form method="POST">
+      <?= csrf_field() ?>
+      <h6 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;"><i class="bi bi-person me-2"></i>Personal Information</h6>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label">First Name</label>
+          <input type="text" name="first_name" class="form-control" value="<?= htmlspecialchars($teacher['first_name'] ?? '') ?>" placeholder="First name">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Second Name</label>
+          <input type="text" name="second_name" class="form-control" value="<?= htmlspecialchars($teacher['second_name'] ?? '') ?>" placeholder="Second name">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Birth Date</label>
+          <input type="date" name="birth_date" class="form-control" value="<?= htmlspecialchars($teacher['birth_date'] ?? '') ?>">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Gender</label>
+          <select name="sexuality" class="form-select">
+            <option value="">Select</option>
+            <option value="Male"   <?= ($teacher['sexuality'] ?? '') == 'Male'   ? 'selected' : '' ?>>Male</option>
+            <option value="Female" <?= ($teacher['sexuality'] ?? '') == 'Female' ? 'selected' : '' ?>>Female</option>
+            <option value="Other"  <?= ($teacher['sexuality'] ?? '') == 'Other'  ? 'selected' : '' ?>>Other</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label class="form-label">NIC Number</label>
+          <input type="text" name="nic_no" class="form-control" value="<?= htmlspecialchars($teacher['nic_no'] ?? '') ?>" placeholder="NIC number">
+        </div>
+      </div>
+
+      <hr style="border-color:var(--border);margin:24px 0;">
+      <h6 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;"><i class="bi bi-briefcase me-2"></i>Professional Details</h6>
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label">School Name</label>
+          <input type="text" name="school_name" class="form-control" value="<?= htmlspecialchars($teacher['school_name'] ?? '') ?>" placeholder="School name">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">School Category</label>
+          <select name="school_category" class="form-select">
+            <option value="">Select</option>
+            <option value="Government" <?= ($teacher['school_category'] ?? '') == 'Government' ? 'selected' : '' ?>>Government</option>
+            <option value="Private"    <?= ($teacher['school_category'] ?? '') == 'Private'    ? 'selected' : '' ?>>Private</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Grade</label>
+          <input type="text" name="grade" class="form-control" placeholder="e.g., Grade 10, 11" value="<?= htmlspecialchars($teacher['grade'] ?? '') ?>">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Main Subject</label>
+          <input type="text" name="main_subject" class="form-control" value="<?= htmlspecialchars($teacher['main_subject'] ?? '') ?>" placeholder="Main subject">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">First Appointment Date</label>
+          <input type="date" name="first_appointment_date" class="form-control" value="<?= htmlspecialchars($teacher['first_appointment_date'] ?? '') ?>">
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2 flex-wrap">
+        <button type="submit" name="update_profile" class="btn btn-primary"><i class="bi bi-check-circle"></i> Save Changes</button>
+        <a href="<?= app_href('teacher/manage_papers.php') ?>" class="btn btn-outline-primary"><i class="bi bi-journal-text"></i> Manage Papers</a>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script>
 function copyToClipboard(text) {

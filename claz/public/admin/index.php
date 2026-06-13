@@ -132,236 +132,186 @@ $sql = "SELECT student_id,name,created_at,is_deleted FROM preapproved_students $
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $students = $stmt->fetchAll();
-require_once __DIR__ . '/../../src/layout.php';
 render_header('Preapproved Students', [], $user);
 ?>
 <?php render_welcome_banner($user); ?>
-<?php render_welcome_banner($user); ?>
 
-<!-- Stats Section -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-  <div style="padding: 1.5rem; background: white; border-radius: 8px; border-bottom: 3px solid #6b7280; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-    <p style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.9rem; font-weight: 600;">
-      <i class="bi bi-people me-1" style="color: #6b7280;"></i>Total Approved
-    </p>
-    <p style="margin: 0; font-size: 2rem; font-weight: 700; color: #1f2937;">
-      <?= $total ?>
-    </p>
-    <p style="margin: 0.5rem 0 0 0; font-size: 0.75rem; color: #9ca3af;">
-      Students in your import
-    </p>
+<?php foreach($errors as $e): ?>
+  <div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i><?= htmlspecialchars($e) ?></div>
+<?php endforeach; ?>
+<?php if($success): ?>
+  <div class="alert alert-success"><i class="bi bi-check-circle-fill me-1"></i><?= htmlspecialchars($success) ?></div>
+<?php endif; ?>
+
+<!-- Stat Cards -->
+<div class="stat-cards">
+  <div class="stat-card">
+    <div class="stat-card-icon blue"><i class="bi bi-people-fill"></i></div>
+    <div>
+      <p class="stat-card-label">Total Approved</p>
+      <p class="stat-card-value"><?= $total ?></p>
+      <p class="stat-card-sub">Students in list</p>
+    </div>
   </div>
-  <div style="padding: 1.5rem; background: white; border-radius: 8px; border-bottom: 3px solid #f59e0b; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-    <p style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.9rem; font-weight: 600;">
-      <i class="bi bi-list me-1" style="color: #f59e0b;"></i>Page Size
-    </p>
-    <p style="margin: 0; font-size: 2rem; font-weight: 700; color: #1f2937;">
-      <?= $perPage ?>
-    </p>
-    <p style="margin: 0.5rem 0 0 0; font-size: 0.75rem; color: #9ca3af;">
-      Rows per view
-    </p>
+  <div class="stat-card">
+    <div class="stat-card-icon yellow"><i class="bi bi-list-ul"></i></div>
+    <div>
+      <p class="stat-card-label">Page Size</p>
+      <p class="stat-card-value"><?= $perPage ?></p>
+      <p class="stat-card-sub">Rows per view</p>
+    </div>
   </div>
-  <div style="padding: 1.5rem; background: white; border-radius: 8px; border-bottom: 3px solid #6b7280; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-    <p style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.9rem; font-weight: 600;">
-      <i class="bi bi-archive me-1" style="color: #9ca3af;"></i>Deleted Filter
-    </p>
-    <p style="margin: 0; font-size: 2rem; font-weight: 700; color: #1f2937;">
-      <?= $showDeleted ? 'ON' : 'OFF' ?>
-    </p>
-    <p style="margin: 0.5rem 0 0 0; font-size: 0.75rem; color: #9ca3af;">
-      Show archived students
-    </p>
+  <div class="stat-card">
+    <div class="stat-card-icon <?= $showDeleted ? 'yellow' : 'gray' ?>"><i class="bi bi-archive"></i></div>
+    <div>
+      <p class="stat-card-label">Deleted Filter</p>
+      <p class="stat-card-value"><?= $showDeleted ? 'ON' : 'OFF' ?></p>
+      <p class="stat-card-sub">Show archived</p>
+    </div>
   </div>
 </div>
 
-<!-- Search and Filter Section -->
-<div style="background: white; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-  <form method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
-    <div>
-      <label style="display: block; margin-bottom: 0.5rem; color: #6b7280; font-size: 0.9rem; font-weight: 600;">Search</label>
-      <input type="text" name="q" value="<?= htmlspecialchars($search) ?>" placeholder="ID or Name" style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.9rem;">
+<!-- Search & Filter -->
+<div class="app-card mb-4">
+  <div class="app-card-header">
+    <h2 class="app-card-title"><i class="bi bi-search text-primary"></i> Search &amp; Filter</h2>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary btn-sm" href="<?= app_href('admin/import.php') ?>"><i class="bi bi-upload"></i> Import</a>
+      <a class="btn btn-outline-secondary btn-sm" href="<?= app_href('admin/export_preapproved.php?q=' . urlencode($search) . '&perPage=' . $perPage . '&sort=' . urlencode($sort) . '&dir=' . urlencode($dir)) ?>" target="_blank"><i class="bi bi-download"></i> CSV</a>
     </div>
-    <div>
-      <label style="display: block; margin-bottom: 0.5rem; color: #6b7280; font-size: 0.9rem; font-weight: 600;">Per Page</label>
-      <select name="perPage" style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.9rem;">
-        <?php foreach($allowedPerPage as $pp): ?>
-          <option value="<?= $pp ?>" <?= $pp===$perPage?'selected':'' ?>><?= $pp ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-    <div>
-      <label style="display: block; margin-bottom: 0.5rem; color: #6b7280; font-size: 0.9rem; font-weight: 600;">Sort By</label>
-      <select name="sort" style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.9rem;">
-        <?php foreach($allowedSort as $sKey): ?>
-          <option value="<?= $sKey ?>" <?= $sKey===$sort?'selected':'' ?>><?= ucfirst(str_replace('_', ' ', $sKey)) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-    <div>
-      <label style="display: block; margin-bottom: 0.5rem; color: #6b7280; font-size: 0.9rem; font-weight: 600;">Direction</label>
-      <select name="dir" style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.9rem;">
-        <option value="asc" <?= $dir==='asc'?'selected':'' ?>>Ascending</option>
-        <option value="desc" <?= $dir==='desc'?'selected':'' ?>>Descending</option>
-      </select>
-    </div>
-    <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <input type="checkbox" name="showDeleted" value="1" id="toggleDeleted" <?= $showDeleted? 'checked':'' ?> onchange="this.form.submit()">
-      <label for="toggleDeleted" style="margin: 0; color: #6b7280; font-size: 0.9rem;">Show deleted</label>
-    </div>
-    <div style="display: flex; gap: 0.5rem;">
-      <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem; font-weight: 600; font-size: 0.9rem;">Search</button>
-      <?php if($search): ?>
-        <a class="btn btn-outline-secondary" href="/admin/index.php" style="padding: 0.5rem 1rem; font-weight: 600; font-size: 0.9rem;">Clear</a>
-      <?php endif; ?>
-    </div>
-  </form>
-</div>
-
-<!-- Action Buttons -->
-<div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2rem;">
-  <a class="btn btn-outline-primary" href="/admin/import.php" style="font-weight: 600; font-size: 0.9rem;">
-    <i class="bi bi-upload me-1"></i>Bulk Import
-  </a>
-  <a class="btn btn-outline-primary" href="/admin/export_preapproved.php?q=<?= urlencode($search) ?>&perPage=<?= $perPage ?>&sort=<?= urlencode($sort) ?>&dir=<?= urlencode($dir) ?>" target="_blank" rel="noreferrer" style="font-weight: 600; font-size: 0.9rem;">
-    <i class="bi bi-download me-1"></i>Export CSV
-  </a>
-  <a class="btn btn-outline-primary" href="/admin/teachers.php" style="font-weight: 600; font-size: 0.9rem;">
-    <i class="bi bi-mortarboard me-1"></i>Teachers
-  </a>
-  <a class="btn btn-outline-primary" href="/admin/logs.php" style="font-weight: 600; font-size: 0.9rem;">
-    <i class="bi bi-journal-text me-1"></i>Audit Logs
-  </a>
-</div>
-<!-- Students Table Section -->
-<div style="background: white; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-  <?php foreach($errors as $e): ?>
-    <div style="padding: 1rem; background: #fee2e2; border-left: 4px solid #dc2626; border-radius: 6px; margin-bottom: 1rem; color: #7f1d1d; font-size: 0.9rem;">
-      <?= htmlspecialchars($e) ?>
-    </div>
-  <?php endforeach; ?>
-  <?php if($success): ?>
-    <div style="padding: 1rem; background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 6px; margin-bottom: 1rem; color: #166534; font-size: 0.9rem;">
-      <?= htmlspecialchars($success) ?>
-    </div>
-  <?php endif; ?>
-  
-  <form method="post" id="bulkForm">
-    <?= csrf_field(); ?>
-    <div class="table-responsive">
-      <table style="width: 100%; font-size: 0.9rem;">
-        <thead>
-          <tr style="border-bottom: 2px solid #e5e7eb;">
-            <th style="padding: 1rem; text-align: left; font-weight: 700; color: #1f2937; width: 50px;">
-              <input aria-label="Select all" type="checkbox" onclick="toggleAll(this)">
-            </th>
-            <th style="padding: 1rem; text-align: left; font-weight: 700; color: #1f2937;">
-              ID
-              <a href="?q=<?= urlencode($search) ?>&perPage=<?= $perPage ?>&sort=student_id&dir=<?= $sort==='student_id' && $dir==='asc'?'desc':'asc' ?>&showDeleted=<?= $showDeleted ?>" style="margin-left: 0.5rem; color: #6b7280; text-decoration: none; font-weight: 600;">↕</a>
-            </th>
-            <th style="padding: 1rem; text-align: left; font-weight: 700; color: #1f2937;">
-              Name
-              <a href="?q=<?= urlencode($search) ?>&perPage=<?= $perPage ?>&sort=name&dir=<?= $sort==='name' && $dir==='asc'?'desc':'asc' ?>&showDeleted=<?= $showDeleted ?>" style="margin-left: 0.5rem; color: #6b7280; text-decoration: none; font-weight: 600;">↕</a>
-            </th>
-            <th style="padding: 1rem; text-align: left; font-weight: 700; color: #1f2937;">
-              Added
-              <a href="?q=<?= urlencode($search) ?>&perPage=<?= $perPage ?>&sort=created_at&dir=<?= $sort==='created_at' && $dir==='asc'?'desc':'asc' ?>&showDeleted=<?= $showDeleted ?>" style="margin-left: 0.5rem; color: #6b7280; text-decoration: none; font-weight: 600;">↕</a>
-            </th>
-            <th style="padding: 1rem; text-align: left; font-weight: 700; color: #1f2937;">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach($students as $s): ?>
-            <tr style="border-bottom: 1px solid #e5e7eb; background-color: <?= $s['is_deleted'] ? '#fee2e2' : 'transparent' ?>;">
-              <td style="padding: 1rem; text-align: center;">
-                <input type="checkbox" name="bulk_ids[]" value="<?= htmlspecialchars($s['student_id']) ?>">
-              </td>
-              <td style="padding: 1rem; color: #1f2937; font-weight: 600;">
-                <?= htmlspecialchars($s['student_id']) ?>
-              </td>
-              <td style="padding: 1rem; color: #1f2937;">
-                <?= htmlspecialchars($s['name']) ?>
-              </td>
-              <td style="padding: 1rem; color: #6b7280; font-size: 0.85rem;">
-                <?= htmlspecialchars($s['created_at']) ?>
-              </td>
-              <td style="padding: 1rem;">
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                  <a class="btn btn-sm btn-outline-primary" href="/admin/edit_student.php?student_id=<?= urlencode($s['student_id']) ?>" style="font-size: 0.8rem;">
-                    <i class="bi bi-pencil me-1"></i>Manage
-                  </a>
-                  <?php if(!$s['is_deleted']): ?>
-                    <button class="btn btn-sm btn-outline-danger" type="submit" name="delete_student" value="<?= htmlspecialchars($s['student_id']) ?>" onclick="return confirm('Delete preapproved student?');" style="font-size: 0.8rem;">
-                      <i class="bi bi-trash me-1"></i>Delete
-                    </button>
-                  <?php else: ?>
-                    <button class="btn btn-sm btn-outline-success" type="submit" name="restore_student" value="<?= htmlspecialchars($s['student_id']) ?>" onclick="return confirm('Restore preapproved student?');" style="font-size: 0.8rem;">
-                      <i class="bi bi-arrow-counterclockwise me-1"></i>Restore
-                    </button>
-                  <?php endif; ?>
-                </div>
-              </td>
-            </tr>
+  </div>
+  <div class="app-card-body">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Search</label>
+        <input type="text" name="q" value="<?= htmlspecialchars($search) ?>" class="form-control" placeholder="ID or Name">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Per Page</label>
+        <select name="perPage" class="form-select">
+          <?php foreach($allowedPerPage as $pp): ?>
+            <option value="<?= $pp ?>" <?= $pp===$perPage?'selected':'' ?>><?= $pp ?></option>
           <?php endforeach; ?>
-          <?php if(empty($students)): ?>
-            <tr>
-              <td colspan="5" style="padding: 3rem 1rem; text-align: center; color: #6b7280;">
-                <i class="bi bi-inbox" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #9ca3af;"></i>
-                No records found
-              </td>
-            </tr>
-          <?php endif; ?>
-        </tbody>
-      </table>
-    </div>
-    
-    <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
-      <button name="bulk_delete" class="btn btn-danger" style="padding: 0.5rem 1rem; font-weight: 600; font-size: 0.9rem;" onclick="return confirm('Delete selected students?');">
-        <i class="bi bi-trash me-1"></i>Bulk Delete
-      </button>
-      <button name="bulk_restore" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-weight: 600; font-size: 0.9rem;" onclick="return confirm('Restore selected students?');">
-        <i class="bi bi-arrow-counterclockwise me-1"></i>Bulk Restore
-      </button>
-    </div>
-    
-    <p style="margin-top: 1rem; color: #6b7280; font-size: 0.85rem;">
-      Page <?= $page ?> of <?= $totalPages ?> (Total <?= $total ?> <?= $showDeleted? '(including deleted)':'' ?>, Showing <?= count($students) ?>)
-    </p>
-    
-    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-      <?php if($page>1): ?>
-        <a class="btn btn-outline-secondary btn-sm" href="?q=<?= urlencode($search) ?>&page=<?= $page-1 ?>&perPage=<?= $perPage ?>&sort=<?= urlencode($sort) ?>&dir=<?= urlencode($dir) ?>&showDeleted=<?= $showDeleted ?>" style="font-weight: 600;">
-          <i class="bi bi-chevron-left me-1"></i>Previous
-        </a>
-      <?php endif; ?>
-      <?php if($page<$totalPages): ?>
-        <a class="btn btn-outline-secondary btn-sm" href="?q=<?= urlencode($search) ?>&page=<?= $page+1 ?>&perPage=<?= $perPage ?>&sort=<?= urlencode($sort) ?>&dir=<?= urlencode($dir) ?>&showDeleted=<?= $showDeleted ?>" style="font-weight: 600;">
-          Next<i class="bi bi-chevron-right ms-1"></i>
-        </a>
-      <?php endif; ?>
-    </div>
-  </form>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Sort By</label>
+        <select name="sort" class="form-select">
+          <?php foreach($allowedSort as $sKey): ?>
+            <option value="<?= $sKey ?>" <?= $sKey===$sort?'selected':'' ?>><?= ucfirst(str_replace('_', ' ', $sKey)) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Direction</label>
+        <select name="dir" class="form-select">
+          <option value="asc"  <?= $dir==='asc' ?'selected':'' ?>>Ascending</option>
+          <option value="desc" <?= $dir==='desc'?'selected':'' ?>>Descending</option>
+        </select>
+      </div>
+      <div class="col-md-2 d-flex align-items-end gap-2">
+        <div class="form-check mb-1">
+          <input type="checkbox" class="form-check-input" name="showDeleted" value="1" id="toggleDeleted" <?= $showDeleted? 'checked':'' ?> onchange="this.form.submit()">
+          <label class="form-check-label" for="toggleDeleted" style="font-size:13px;">Show deleted</label>
+        </div>
+      </div>
+      <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> Search</button>
+        <?php if($search): ?>
+          <a class="btn btn-outline-secondary btn-sm" href="<?= app_href('admin/index.php') ?>">Clear</a>
+        <?php endif; ?>
+      </div>
+    </form>
+  </div>
 </div>
 
-<!-- Add Student Section -->
-<div style="background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-  <h3 style="margin: 0 0 1.5rem 0; font-size: 1.1rem; font-weight: 700; color: #1f2937;">
-    <i class="bi bi-plus-circle me-2"></i>Add Preapproved Student
-  </h3>
-  <form method="post" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
-    <?= csrf_field(); ?>
-    <div>
-      <label style="display: block; margin-bottom: 0.5rem; color: #6b7280; font-size: 0.9rem; font-weight: 600;">Student ID</label>
-      <input class="form-control" name="student_id" required style="padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.9rem; width: 100%;">
-    </div>
-    <div>
-      <label style="display: block; margin-bottom: 0.5rem; color: #6b7280; font-size: 0.9rem; font-weight: 600;">Name</label>
-      <input class="form-control" name="student_name" style="padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.9rem; width: 100%;">
-    </div>
-    <button name="add_student" class="btn btn-primary" style="padding: 0.5rem 1.5rem; font-weight: 600; font-size: 0.9rem; background-color: #3b82f6; border-color: #3b82f6; width: 100%;">
-      <i class="bi bi-plus me-1"></i>Add Student
-    </button>
-  </form>
+<!-- Students Table -->
+<div class="app-card mb-4">
+  <div class="app-card-header">
+    <h2 class="app-card-title"><i class="bi bi-table text-primary"></i> Student Records</h2>
+    <span class="badge-soft badge-soft-gray">Page <?= $page ?> of <?= $totalPages ?> &bull; <?= $total ?> total</span>
+  </div>
+  <div class="app-card-body no-pad">
+    <form method="post" id="bulkForm">
+      <?= csrf_field(); ?>
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead style="background:var(--surface-subtle);">
+            <tr>
+              <th style="padding:10px 16px;font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);width:40px;">
+                <input aria-label="Select all" type="checkbox" onclick="toggleAll(this)">
+              </th>
+              <th style="padding:10px 16px;font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">ID <a href="?q=<?= urlencode($search) ?>&perPage=<?= $perPage ?>&sort=student_id&dir=<?= $sort==='student_id' && $dir==='asc'?'desc':'asc' ?>&showDeleted=<?= $showDeleted ?>" style="color:var(--muted);">↕</a></th>
+              <th style="padding:10px 16px;font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Name <a href="?q=<?= urlencode($search) ?>&perPage=<?= $perPage ?>&sort=name&dir=<?= $sort==='name' && $dir==='asc'?'desc':'asc' ?>&showDeleted=<?= $showDeleted ?>" style="color:var(--muted);">↕</a></th>
+              <th style="padding:10px 16px;font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Added <a href="?q=<?= urlencode($search) ?>&perPage=<?= $perPage ?>&sort=created_at&dir=<?= $sort==='created_at' && $dir==='asc'?'desc':'asc' ?>&showDeleted=<?= $showDeleted ?>" style="color:var(--muted);">↕</a></th>
+              <th style="padding:10px 16px;font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach($students as $s): ?>
+              <tr style="<?= $s['is_deleted'] ? 'background:var(--danger-bg);' : '' ?>">
+                <td style="padding:11px 16px;vertical-align:middle;border-bottom:1px solid var(--border);">
+                  <input type="checkbox" name="bulk_ids[]" value="<?= htmlspecialchars($s['student_id']) ?>">
+                </td>
+                <td style="padding:11px 16px;vertical-align:middle;border-bottom:1px solid var(--border);font-weight:600;color:var(--on-surface);font-size:13px;"><?= htmlspecialchars($s['student_id']) ?></td>
+                <td style="padding:11px 16px;vertical-align:middle;border-bottom:1px solid var(--border);font-size:13px;color:var(--on-surface);"><?= htmlspecialchars($s['name']) ?></td>
+                <td style="padding:11px 16px;vertical-align:middle;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);"><?= htmlspecialchars($s['created_at']) ?></td>
+                <td style="padding:11px 16px;vertical-align:middle;border-bottom:1px solid var(--border);">
+                  <div class="d-flex gap-2 flex-wrap">
+                    <a class="btn btn-sm btn-outline-primary" href="<?= app_href('admin/edit_student.php?student_id=' . urlencode($s['student_id'])) ?>"><i class="bi bi-pencil"></i> Manage</a>
+                    <?php if(!$s['is_deleted']): ?>
+                      <button class="btn btn-sm btn-outline-danger" type="submit" name="delete_student" value="<?= htmlspecialchars($s['student_id']) ?>" onclick="return confirm('Delete preapproved student?');"><i class="bi bi-trash"></i></button>
+                    <?php else: ?>
+                      <button class="btn btn-sm btn-outline-success" type="submit" name="restore_student" value="<?= htmlspecialchars($s['student_id']) ?>" onclick="return confirm('Restore preapproved student?');"><i class="bi bi-arrow-counterclockwise"></i> Restore</button>
+                    <?php endif; ?>
+                  </div>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+            <?php if(empty($students)): ?>
+              <tr><td colspan="5" class="text-center py-5" style="color:var(--muted-light);"><i class="bi bi-inbox" style="display:block;font-size:2rem;margin-bottom:8px;"></i>No records found</td></tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex gap-2 p-3" style="border-top:1px solid var(--border);">
+        <button name="bulk_delete"  class="btn btn-danger btn-sm"     onclick="return confirm('Delete selected students?');"><i class="bi bi-trash"></i> Bulk Delete</button>
+        <button name="bulk_restore" class="btn btn-secondary btn-sm"  onclick="return confirm('Restore selected students?');"><i class="bi bi-arrow-counterclockwise"></i> Bulk Restore</button>
+      </div>
+      <div class="d-flex gap-2 px-4 pb-3 pt-1">
+        <?php if($page>1): ?>
+          <a class="btn btn-outline-secondary btn-sm" href="?q=<?= urlencode($search) ?>&page=<?= $page-1 ?>&perPage=<?= $perPage ?>&sort=<?= urlencode($sort) ?>&dir=<?= urlencode($dir) ?>&showDeleted=<?= $showDeleted ?>"><i class="bi bi-chevron-left"></i> Prev</a>
+        <?php endif; ?>
+        <?php if($page<$totalPages): ?>
+          <a class="btn btn-outline-secondary btn-sm" href="?q=<?= urlencode($search) ?>&page=<?= $page+1 ?>&perPage=<?= $perPage ?>&sort=<?= urlencode($sort) ?>&dir=<?= urlencode($dir) ?>&showDeleted=<?= $showDeleted ?>">Next <i class="bi bi-chevron-right"></i></a>
+        <?php endif; ?>
+        <span style="font-size:12px;color:var(--muted);align-self:center;">Showing <?= count($students) ?> of <?= $total ?></span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Student -->
+<div class="app-card">
+  <div class="app-card-header">
+    <h2 class="app-card-title"><i class="bi bi-plus-circle text-primary"></i> Add Preapproved Student</h2>
+  </div>
+  <div class="app-card-body">
+    <form method="post" class="row g-3 align-items-end">
+      <?= csrf_field(); ?>
+      <div class="col-md-4">
+        <label class="form-label">Student ID</label>
+        <input class="form-control" name="student_id" required placeholder="e.g., 20240001">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Name</label>
+        <input class="form-control" name="student_name" placeholder="Full name">
+      </div>
+      <div class="col-md-4">
+        <button name="add_student" class="btn btn-primary w-100"><i class="bi bi-plus"></i> Add Student</button>
+      </div>
+    </form>
+  </div>
 </div>
 <script>
 function toggleAll(box){

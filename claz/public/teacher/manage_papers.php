@@ -53,131 +53,100 @@ $draftCount = count($papers) - $publishedCount;
 render_header('Manage Papers');
 ?>
 
-<div class="app-content">
-  <div class="container-xxl">
-    <?php render_welcome_banner($user); ?>
-    <?php foreach ($errors as $e): ?>
-      <div class="alert alert-danger"><?= htmlspecialchars($e) ?></div>
-    <?php endforeach; ?>
-    <?php if ($success): ?>
-      <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-    <?php endif; ?>
+<?php render_welcome_banner($user); ?>
+<?php foreach ($errors as $e): ?>
+  <div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i><?= htmlspecialchars($e) ?></div>
+<?php endforeach; ?>
+<?php if ($success): ?>
+  <div class="alert alert-success"><i class="bi bi-check-circle-fill me-1"></i><?= htmlspecialchars($success) ?></div>
+<?php endif; ?>
 
-    <!-- Stats Section -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-      <div style="padding: 1.5rem; background: white; border-radius: 8px; border-bottom: 3px solid #6b7280; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-        <p style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.9rem; font-weight: 600;">
-          <i class="bi bi-file-text me-1" style="color: #6b7280;"></i>Total Papers
-        </p>
-        <p style="margin: 0; font-size: 2rem; font-weight: 700; color: #1f2937;">
-          <?= count($papers) ?>
-        </p>
-      </div>
-      <div style="padding: 1.5rem; background: white; border-radius: 8px; border-bottom: 3px solid #10b981; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-        <p style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.9rem; font-weight: 600;">
-          <i class="bi bi-eye me-1" style="color: #10b981;"></i>Published
-        </p>
-        <p style="margin: 0; font-size: 2rem; font-weight: 700; color: #10b981;">
-          <?= $publishedCount ?>
-        </p>
-      </div>
-      <div style="padding: 1.5rem; background: white; border-radius: 8px; border-bottom: 3px solid #9ca3af; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-        <p style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.9rem; font-weight: 600;">
-          <i class="bi bi-pencil me-1" style="color: #9ca3af;"></i>Drafts
-        </p>
-        <p style="margin: 0; font-size: 2rem; font-weight: 700; color: #6b7280;">
-          <?= $draftCount ?>
-        </p>
-      </div>
+<!-- Stat Cards -->
+<div class="stat-cards">
+  <div class="stat-card">
+    <div class="stat-card-icon blue"><i class="bi bi-journal-text"></i></div>
+    <div>
+      <p class="stat-card-label">Total Papers</p>
+      <p class="stat-card-value"><?= count($papers) ?></p>
     </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-icon green"><i class="bi bi-eye-fill"></i></div>
+    <div>
+      <p class="stat-card-label">Published</p>
+      <p class="stat-card-value"><?= $publishedCount ?></p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-icon gray"><i class="bi bi-pencil"></i></div>
+    <div>
+      <p class="stat-card-label">Drafts</p>
+      <p class="stat-card-value"><?= $draftCount ?></p>
+    </div>
+  </div>
+</div>
 
-    <!-- Papers Section -->
-    <div style="background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h2 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: #1f2937;">
-          <i class="bi bi-file-earmark me-2"></i>Your Papers
-        </h2>
-        <a href="new_paper.php" class="btn btn-primary" style="background-color: #3b82f6; border-color: #3b82f6; border-radius: 6px; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.9rem;">
-          <i class="bi bi-plus me-1"></i>Create New
-        </a>
+<!-- Papers Card -->
+<div class="app-card">
+  <div class="app-card-header">
+    <h2 class="app-card-title"><i class="bi bi-file-earmark text-primary"></i> Your Papers</h2>
+    <a href="<?= app_href('teacher/create_paper.php') ?>" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> Create New</a>
+  </div>
+  <div class="app-card-body">
+    <?php if (empty($papers)): ?>
+      <div class="text-center py-5">
+        <i class="bi bi-inbox" style="font-size:2.5rem;color:var(--muted-light);display:block;margin-bottom:12px;"></i>
+        <p class="fw-semibold mb-1" style="color:var(--on-surface);">No papers yet</p>
+        <a href="<?= app_href('teacher/create_paper.php') ?>" class="btn btn-primary btn-sm mt-2"><i class="bi bi-plus"></i> Create your first paper</a>
       </div>
-
-      <?php if (empty($papers)): ?>
-        <div style="padding: 3rem 2rem; background: #f3f4f6; border-radius: 8px; text-align: center; color: #6b7280;">
-          <i class="bi bi-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block; color: #9ca3af;"></i>
-          <p style="margin: 0; font-weight: 600;">No papers created yet</p>
-          <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">
-            <a href="new_paper.php" style="color: #3b82f6; text-decoration: none; font-weight: 600;">Create your first paper</a>
-          </p>
-        </div>
-      <?php else: ?>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
-          <?php foreach ($papers as $p): ?>
-            <div style="padding: 1.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; transition: all 0.2s;">
-              <div style="margin-bottom: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem; margin-bottom: 0.5rem;">
-                  <p style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1f2937; flex: 1;">
-                    <?= htmlspecialchars(substr($p['title'], 0, 40)) ?>
-                  </p>
-                  <span style="background: <?= $p['is_published'] ? '#dcfce7' : '#fef3c7' ?>; color: <?= $p['is_published'] ? '#166534' : '#92400e' ?>; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; white-space: nowrap;">
-                    <?= $p['is_published'] ? '✓ Published' : '○ Draft' ?>
-                  </span>
-                </div>
-                <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;">
-                  <div>
-                    <p style="margin: 0 0 0.25rem 0; color: #9ca3af; font-weight: 600; font-size: 0.75rem;">Fee</p>
-                    <p style="margin: 0; font-weight: 600; color: #1f2937;">
-                      <?php if ($p['fee_cents'] > 0): ?>
-                        Rs. <?= number_format($p['fee_cents'] / 100, 2) ?>
-                      <?php else: ?>
-                        Free
-                      <?php endif; ?>
-                    </p>
-                  </div>
-                  <div>
-                    <p style="margin: 0 0 0.25rem 0; color: #9ca3af; font-weight: 600; font-size: 0.75rem;">Duration</p>
-                    <p style="margin: 0; font-weight: 600; color: #1f2937;">
-                      <?= intval($p['time_limit_seconds'] / 60) ?> min
-                    </p>
-                  </div>
-                  <div>
-                    <p style="margin: 0 0 0.25rem 0; color: #9ca3af; font-weight: 600; font-size: 0.75rem;">ID</p>
-                    <p style="margin: 0; font-weight: 600; color: #1f2937;">
-                      <?= $p['id'] ?>
-                    </p>
-                  </div>
-                </div>
+    <?php else: ?>
+      <div class="row g-3">
+        <?php foreach ($papers as $p): ?>
+        <div class="col-md-6 col-lg-4">
+          <div class="item-card h-100 d-flex flex-column" style="gap:0;">
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <p class="fw-semibold mb-0" style="font-size:14px;color:var(--on-surface);flex:1;padding-right:8px;"><?= htmlspecialchars(substr($p['title'], 0, 45)) ?></p>
+                <?php if ($p['is_published']): ?>
+                  <span class="badge-soft badge-soft-success flex-shrink-0"><i class="bi bi-check2"></i> Live</span>
+                <?php else: ?>
+                  <span class="badge-soft badge-soft-gray flex-shrink-0">Draft</span>
+                <?php endif; ?>
               </div>
-              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; border-top: 1px solid #e5e7eb; padding-top: 1rem;">
-                <a class="btn btn-sm btn-outline-primary" href="<?= htmlspecialchars(app_href('teacher/edit_paper.php?paper_id=' . $p['id'])) ?>" style="flex: 1; min-width: 80px; text-align: center; font-size: 0.85rem;">
-                  <i class="bi bi-pencil me-1"></i>Edit
-                </a>
-                <a class="btn btn-sm btn-outline-success" href="<?= htmlspecialchars(app_href('teacher/test_paper.php?paper_id=' . $p['id'])) ?>" style="flex: 1; min-width: 80px; text-align: center; font-size: 0.85rem;">
-                  <i class="bi bi-play-fill me-1"></i>Test
-                </a>
-                <a class="btn btn-sm btn-outline-info" href="<?= htmlspecialchars(app_href('teacher/assign.php?paper_id=' . $p['id'])) ?>" style="flex: 1; min-width: 80px; text-align: center; font-size: 0.85rem;">
-                  <i class="bi bi-people me-1"></i>Assign
-                </a>
-                <form method="post" class="d-inline" style="flex: 1; min-width: 80px;">
-                  <?= csrf_field(); ?>
-                  <input type="hidden" name="paper_id" value="<?= $p['id'] ?>">
-                  <button name="toggle_publish" class="btn btn-sm btn-outline-secondary w-100" style="font-size: 0.85rem;">
-                    <i class="bi <?= $p['is_published'] ? 'bi-eye-slash' : 'bi-eye' ?> me-1"></i><?= $p['is_published'] ? 'Unpub' : 'Pub' ?>
-                  </button>
-                </form>
-                <form method="post" style="flex: 1; min-width: 80px;">
-                  <?= csrf_field(); ?>
-                  <input type="hidden" name="paper_id" value="<?= $p['id'] ?>">
-                  <button name="delete_paper" class="btn btn-sm btn-outline-danger w-100" style="font-size: 0.85rem;" onclick="return confirm('Delete this paper? This cannot be undone.');">
-                    <i class="bi bi-trash me-1"></i>Delete
-                  </button>
-                </form>
+              <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge-soft badge-soft-gray"><i class="bi bi-hourglass"></i> <?= intval($p['time_limit_seconds'] / 60) ?> min</span>
+                <?php if ($p['fee_cents'] > 0): ?>
+                  <span class="badge-soft badge-soft-primary"><i class="bi bi-tag"></i> Rs <?= number_format($p['fee_cents'] / 100, 2) ?></span>
+                <?php else: ?>
+                  <span class="badge-soft badge-soft-success"><i class="bi bi-check-circle"></i> Free</span>
+                <?php endif; ?>
+                <span class="badge-soft badge-soft-gray" style="font-size:10.5px;">ID: <?= $p['id'] ?></span>
               </div>
             </div>
-          <?php endforeach; ?>
+            <div class="d-flex flex-wrap gap-2 pt-3" style="border-top:1px solid var(--border);">
+              <a class="btn btn-outline-primary btn-sm" href="<?= htmlspecialchars(app_href('teacher/edit_paper.php?paper_id=' . $p['id'])) ?>"><i class="bi bi-pencil"></i> Edit</a>
+              <a class="btn btn-outline-success btn-sm" href="<?= htmlspecialchars(app_href('teacher/test_paper.php?paper_id=' . $p['id'])) ?>"><i class="bi bi-play-fill"></i> Test</a>
+              <a class="btn btn-outline-secondary btn-sm" href="<?= htmlspecialchars(app_href('teacher/assign.php?paper_id=' . $p['id'])) ?>"><i class="bi bi-people"></i> Assign</a>
+              <form method="post" class="d-inline">
+                <?= csrf_field(); ?>
+                <input type="hidden" name="paper_id" value="<?= $p['id'] ?>">
+                <button name="toggle_publish" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi <?= $p['is_published'] ? 'bi-eye-slash' : 'bi-eye' ?>"></i> <?= $p['is_published'] ? 'Unpub' : 'Pub' ?>
+                </button>
+              </form>
+              <form method="post">
+                <?= csrf_field(); ?>
+                <input type="hidden" name="paper_id" value="<?= $p['id'] ?>">
+                <button name="delete_paper" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this paper? Cannot be undone.');">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
-      <?php endif; ?>
-    </div>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
   </div>
 </div>
 

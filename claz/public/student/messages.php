@@ -47,85 +47,100 @@ if ($activePeerId === 0 && $contacts) {
 }
 render_header('Messages', [], $user);
 ?>
-<div class="row g-4">
-  <div class="col-lg-4">
-    <div class="app-card p-3 h-100">
-      <div class="d-flex align-items-center justify-content-between mb-3">
+<div class="row g-4" style="height:calc(100vh - var(--topbar-h) - 80px); min-height: 500px;">
+  <!-- Contacts panel -->
+  <div class="col-lg-4 h-100">
+    <div class="app-card h-100 d-flex flex-column" style="overflow:hidden;">
+      <div class="app-card-header">
         <div>
-          <p class="text-muted small mb-0">Teachers</p>
-          <h5 class="mb-0">Chats</h5>
+          <p class="mb-0" style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);">Conversations</p>
+          <h2 class="app-card-title mt-0">Teachers</h2>
         </div>
-        <span class="badge bg-primary-subtle text-primary"><?= count($contacts) ?> linked</span>
+        <span class="badge-soft badge-soft-primary"><?= count($contacts) ?> linked</span>
       </div>
-      <?php if (empty($contacts)): ?>
-        <div class="alert alert-warning" role="alert">No teachers linked to your account yet.</div>
-      <?php else: ?>
-        <div class="list-group chat-contact-list" id="chatContacts" role="listbox">
-          <?php foreach ($contacts as $c): ?>
-            <button
-              type="button"
-              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center chat-contact"
-              data-peer-id="<?= (int)$c['id'] ?>"
-              data-peer-name="<?= htmlspecialchars($c['name']) ?>"
-              aria-label="Chat with <?= htmlspecialchars($c['name']) ?>"
-              <?php if ($activePeerId === (int)$c['id']) echo 'aria-current="true"'; ?>
-            >
-              <span class="d-flex flex-column text-start">
-                <strong><?= htmlspecialchars($c['name']) ?></strong>
-                <small class="text-muted"><?= htmlspecialchars($c['email']) ?></small>
-              </span>
-              <?php if ((int)$c['unread'] > 0): ?>
-                <span class="badge bg-danger-subtle text-danger ms-2"><?= (int)$c['unread'] ?></span>
-              <?php else: ?>
-                <span class="text-muted small"><i class="bi bi-chat-dots" style="color: white;"></i></span>
-              <?php endif; ?>
-            </button>
-          <?php endforeach; ?>
-        </div>
-      <?php endif; ?>
+      <div class="flex-grow-1 overflow-y-auto" style="overflow-y:auto;">
+        <?php if (empty($contacts)): ?>
+          <div class="p-4 text-center">
+            <i class="bi bi-person-x" style="font-size:2rem;color:var(--muted-light);display:block;margin-bottom:10px;"></i>
+            <p class="mb-0" style="font-size:13px;color:var(--muted);">No teachers linked yet.</p>
+          </div>
+        <?php else: ?>
+          <div id="chatContacts" role="listbox" style="display:flex;flex-direction:column;">
+            <?php foreach ($contacts as $c): ?>
+              <button
+                type="button"
+                class="chat-contact d-flex align-items-center gap-3 px-4 py-3 text-start border-0 bg-transparent w-100"
+                data-peer-id="<?= (int)$c['id'] ?>"
+                data-peer-name="<?= htmlspecialchars($c['name']) ?>"
+                aria-label="Chat with <?= htmlspecialchars($c['name']) ?>"
+                <?php if ($activePeerId === (int)$c['id']) echo 'aria-current="true"'; ?>
+                style="border-bottom:1px solid var(--border)!important;transition:background var(--transition);cursor:pointer;"
+              >
+                <div class="sidebar-avatar flex-shrink-0"><?= strtoupper(substr($c['name'], 0, 1)) ?></div>
+                <div class="flex-grow-1 min-width-0">
+                  <p class="mb-0 fw-semibold" style="font-size:13.5px;color:var(--on-surface);"><?= htmlspecialchars($c['name']) ?></p>
+                  <p class="mb-0" style="font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($c['email']) ?></p>
+                </div>
+                <?php if ((int)$c['unread'] > 0): ?>
+                  <span class="badge-soft badge-soft-danger flex-shrink-0"><?= (int)$c['unread'] ?></span>
+                <?php endif; ?>
+              </button>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </div>
     </div>
   </div>
-  <div class="col-lg-8">
-    <div class="app-card p-3 h-100 d-flex flex-column">
-      <div class="d-flex align-items-center justify-content-between mb-3">
+
+  <!-- Chat panel -->
+  <div class="col-lg-8 h-100">
+    <div class="app-card h-100 d-flex flex-column" style="overflow:hidden;">
+      <!-- Chat header -->
+      <div class="app-card-header flex-shrink-0">
         <div>
-          <p class="text-muted small mb-1">Active conversation</p>
-          <h5 class="mb-0" id="peerName">Select a teacher to start</h5>
+          <p class="mb-0" style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);">Active conversation</p>
+          <h2 class="app-card-title mt-0" id="peerName">Select a teacher to start</h2>
         </div>
         <div class="d-flex align-items-center gap-2">
-          <span class="badge bg-light text-muted" id="chatStatus">Idle</span>
-          <button class="btn btn-sm btn-outline-secondary" id="refreshBtn"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+          <span class="badge-soft badge-soft-gray" id="chatStatus">Idle</span>
+          <button class="btn btn-sm btn-outline-secondary" id="refreshBtn"><i class="bi bi-arrow-repeat"></i></button>
         </div>
       </div>
+
       <?php if (!$msgTableExists): ?>
-        <div class="alert alert-warning" role="alert">
-          Messages table is missing. Please run init_schema.php to create it.
-        </div>
+        <div class="alert alert-warning m-3" role="alert">Messages table is missing. Please run init_schema.php.</div>
       <?php endif; ?>
-      <div class="border rounded chat-scroll mb-3" id="chatMessages" role="log" aria-live="polite" aria-busy="false">
-        <p class="text-muted text-center py-4 mb-0">Select a teacher to load messages.</p>
+
+      <!-- Messages scroll area -->
+      <div class="flex-grow-1 chat-scroll" id="chatMessages" role="log" aria-live="polite" aria-busy="false" style="overflow-y:auto;padding:16px;">
+        <p class="text-center mb-0 py-4" style="color:var(--muted);">Select a teacher to load messages.</p>
       </div>
-      <div id="chatAlert" class="alert alert-danger d-none" role="alert"></div>
-      <form id="sendForm" class="mt-auto" autocomplete="off">
-        <div class="file-upload-area mb-2 d-none" id="attachmentPreview">
-          <div class="alert alert-info d-flex align-items-center justify-content-between mb-0">
-            <span id="attachmentName">No file selected</span>
-            <button type="button" class="btn btn-sm btn-danger" id="clearAttachment"><i class="bi bi-x"></i></button>
-          </div>
+
+      <div id="chatAlert" class="alert alert-danger d-none mx-3 mt-2" role="alert"></div>
+
+      <!-- Attachment preview -->
+      <div class="file-upload-area d-none mx-3 mt-2" id="attachmentPreview">
+        <div class="alert alert-info d-flex align-items-center justify-content-between mb-0 py-2">
+          <span id="attachmentName" style="font-size:13px;">No file selected</span>
+          <button type="button" class="btn btn-sm btn-outline-danger" id="clearAttachment"><i class="bi bi-x"></i></button>
         </div>
+      </div>
+
+      <!-- Send form -->
+      <form id="sendForm" autocomplete="off" class="flex-shrink-0 p-3" style="border-top:1px solid var(--border);">
         <div class="input-group">
           <div class="file-upload-area">
             <input type="file" id="fileInput" accept="image/*,.pdf" <?= empty($contacts) ? 'disabled' : '' ?> />
-            <button type="button" class="btn btn-outline-secondary" id="fileBtn" <?= empty($contacts) ? 'disabled' : '' ?>>
+            <button type="button" class="btn btn-outline-secondary" id="fileBtn" <?= empty($contacts) ? 'disabled' : '' ?> title="Attach file">
               <i class="bi bi-paperclip"></i>
             </button>
           </div>
-          <button type="button" class="btn btn-outline-secondary voice-record-btn" id="voiceBtn" <?= empty($contacts) ? 'disabled' : '' ?>>
+          <button type="button" class="btn btn-outline-secondary voice-record-btn" id="voiceBtn" <?= empty($contacts) ? 'disabled' : '' ?> title="Voice message">
             <i class="bi bi-mic-fill"></i>
           </button>
-          <textarea class="form-control" id="messageInput" rows="2" placeholder="Type your message" <?= empty($contacts) ? 'disabled' : '' ?>></textarea>
+          <textarea class="form-control" id="messageInput" rows="1" placeholder="Type your message…" <?= empty($contacts) ? 'disabled' : '' ?> style="resize:none;min-height:40px;"></textarea>
           <button class="btn btn-primary" type="submit" id="sendBtn" <?= empty($contacts) ? 'disabled' : '' ?>>
-            <i class="bi bi-send-fill"></i> Send
+            <i class="bi bi-send-fill"></i>
           </button>
         </div>
       </form>
