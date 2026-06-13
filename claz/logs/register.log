@@ -1,0 +1,2 @@
+2025-12-14T19:37:29+01:00 | testg@gmail.com | Registration failed: SQLSTATE[42S02]: Base table or view not found: 1932 Table 'ceylonstudyhub.users' doesn't exist in engine
+2025-12-14T19:41:09+01:00 | testg@gmail.com | Registration failed: SQLSTATE[42S02]: Base table or view not found: 1932 Table 'ceylonstudyhub.users' doesn't exist in engine

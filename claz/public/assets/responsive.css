@@ -1,0 +1,156 @@
+/* ===== COMPREHENSIVE MOBILE-FIRST RESPONSIVE DESIGN ===== */
+
+/* Extra Small Devices (Mobile) - 320px to 575px */
+@media (max-width: 575.98px) {
+	:root { --radius-lg: 12px; }
+	body { font-size: 14px; }
+	h1 { font-size: 1.5rem !important; }
+	h2 { font-size: 1.25rem !important; }
+	h3 { font-size: 1.1rem !important; }
+	
+	.app-navbar { padding: 0.5rem 0; }
+	.container, .container-sm, .container-md, .container-lg, .container-xl, .container-xxl {
+		padding-left: 1rem; padding-right: 1rem;
+	}
+	.app-card, .card, section {
+		margin-bottom: 1rem; padding: 1rem !important; border-radius: 12px;
+	}
+	.form-control, .form-select, input, textarea, select {
+		padding: 0.6rem !important; font-size: 16px !important; min-height: 44px;
+	}
+	.btn { padding: 0.6rem 1rem !important; min-height: 44px; font-size: 0.95rem; }
+	.btn-sm { padding: 0.4rem 0.75rem !important; min-height: 36px; font-size: 0.85rem; }
+	.row { gap: 0.75rem; }
+	.modal-dialog { margin: 0.5rem; width: 95vw !important; }
+	.table { font-size: 0.85rem; display: block; overflow-x: auto; white-space: nowrap; }
+	img { max-width: 100%; height: auto; }
+	#sticky-info-bar { gap: 0.5rem !important; }
+	.accordion-button { padding: 0.75rem; font-size: 0.95rem; }
+	.p-5 { padding: 1rem !important; }
+	.px-5 { padding-left: 1rem !important; padding-right: 1rem !important; }
+	.py-5 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+	.mb-5 { margin-bottom: 1.5rem !important; }
+	.mt-5 { margin-top: 1.5rem !important; }
+	.navbar-nav { padding: 1rem 0; }
+	.navbar-toggler { padding: 0.25rem 0.5rem; }
+	
+	/* Mobile navbar collapse menu */
+	.navbar-collapse {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		background: white;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		border-radius: 0 0 12px 12px;
+		padding: 1rem;
+		margin-top: 0.5rem;
+		z-index: 1050 !important;
+	}
+	
+	.navbar-collapse .navbar-nav {
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	
+	.navbar-collapse .nav-item {
+		width: 100%;
+	}
+	
+	.navbar-collapse .nav-link {
+		padding: 0.75rem 1rem;
+		border-radius: 8px;
+		display: block;
+		color: #333 !important;
+	}
+	
+	.navbar-collapse .nav-link:hover {
+		background-color: #f8f9fa;
+		color: #000 !important;
+	}
+	
+	.navbar-collapse .d-flex.align-items-center {
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-top: 1rem;
+		padding-top: 1rem;
+		border-top: 1px solid #e9ecef;
+		width: 100%;
+	}
+	
+	.navbar-collapse .dropdown {
+		width: 100%;
+	}
+	
+	.navbar-collapse .dropdown .btn {
+		width: 100%;
+		justify-content: center;
+	}
+	
+	.navbar-collapse .dropdown-menu {
+		position: static !important;
+		transform: none !important;
+		box-shadow: none !important;
+		border: none !important;
+		width: 100%;
+		margin-top: 0.5rem;
+	}
+	
+	.app-navbar {
+		position: relative;
+	}
+	
+	textarea { resize: vertical; max-height: 200px; }
+	.grid-auto-fit { grid-template-columns: 1fr !important; }
+	.d-grid { display: grid; gap: 0.75rem; }
+	.overflow-auto { overflow: auto; -webkit-overflow-scrolling: touch; }
+}
+
+/* Small Devices (Tablets Portrait) - 576px to 767px */
+@media (min-width: 576px) and (max-width: 767.98px) {
+	:root { font-size: 15px; }
+	h1 { font-size: 1.75rem; }
+	h2 { font-size: 1.5rem; }
+	h3 { font-size: 1.25rem; }
+	.container, .container-sm { padding-left: 1.5rem; padding-right: 1.5rem; }
+	.app-card, .card { padding: 1.5rem !important; }
+	.form-control, .form-select { min-height: 40px; }
+	.btn { min-height: 40px; }
+}
+
+/* Medium Devices (Tablets Landscape) - 768px to 991px */
+@media (min-width: 768px) and (max-width: 991.98px) {
+	h1 { font-size: 2rem; }
+	h2 { font-size: 1.75rem; }
+	h3 { font-size: 1.35rem; }
+	.app-card, .card { padding: 2rem !important; }
+	.grid-auto-fit { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* Large Devices (Desktops) - 992px and up */
+@media (min-width: 992px) {
+	.grid-auto-fit { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important; }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+	.app-navbar { padding: 0.25rem 0; }
+	h1, h2, h3, h4, h5, h6 { margin-bottom: 0.5rem; }
+	.app-card { padding: 1rem !important; }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+	button, a, input[type="checkbox"], input[type="radio"] {
+		min-height: 44px; min-width: 44px;
+	}
+	.nav-link { padding: 0.75rem 1rem; }
+	.btn { margin: 0.25rem; }
+}
+
+/* Print media */
+@media print {
+	.app-navbar, .navbar-toggler, .btn, .btn-close { display: none !important; }
+	body { font-size: 12pt; }
+	.app-card { page-break-inside: avoid; }
+}
