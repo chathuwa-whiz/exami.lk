@@ -1,4 +1,4 @@
-php -r "$p=password_hash('NewStrongPass1!', PASSWORD_DEFAULT); echo $p;"php -r "$p=password_hash('NewStrongPass1!', PASSWORD_DEFAULT); echo $p;"php -r "$p=password_hash('NewStrongPass1!', PASSWORD_DEFAULT); echo $p;"<?php
+<?php
 require_once __DIR__ . '/../../src/config.php';
 require_once __DIR__ . '/../../src/layout.php';
 require_login();
