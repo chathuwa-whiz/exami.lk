@@ -54,6 +54,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 render_auth_shell_start('Welcome back', 'Sign in to continue where you left off.');
 ?>
+<style>
+.auth-left { position: relative; }
+.auth-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('<?= htmlspecialchars(app_href('assets/examihome.png')) ?>') center / cover no-repeat;
+  opacity: .08;
+  pointer-events: none;
+}
+.auth-left > * { position: relative; }
+</style>
 <?php if ($error): ?>
   <div class="alert alert-danger" role="alert" aria-live="assertive">
     <i class="bi bi-exclamation-triangle-fill"></i>
