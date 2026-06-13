@@ -158,6 +158,7 @@ img { max-width: 100%; }
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   gap: 6px;
+  transition: padding var(--transition-slow), gap var(--transition-slow);
 }
 
 .sidebar-brand {
@@ -169,6 +170,7 @@ img { max-width: 100%; }
   min-width: 0;
   flex: 1;
   overflow: hidden;
+  transition: flex var(--transition-slow), opacity var(--transition-slow);
 }
 
 .sidebar-logo {
@@ -207,6 +209,18 @@ img { max-width: 100%; }
   opacity: 0;
   max-width: 0;
   pointer-events: none;
+}
+
+.app-sidebar.sidebar-collapsed .sidebar-brand {
+  flex: 0 0 0px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-sidebar.sidebar-collapsed .sidebar-header {
+  padding: 0;
+  justify-content: center;
+  gap: 0;
 }
 
 .sidebar-toggle-btn {
