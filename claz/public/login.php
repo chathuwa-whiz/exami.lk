@@ -54,24 +54,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 render_auth_shell_start('Welcome back', 'Sign in to continue where you left off.');
 ?>
-<div class="mb-4">
-  <h1 class="h3 fw-semibold text-dark mb-1 d-flex align-items-center gap-2"><i class="bi bi-box-arrow-in-right text-primary"></i> Sign in</h1>
-  <p class="text-muted mb-0">Access your classes, exam papers and results.</p>
-</div>
-  <?php if ($error): ?><div class="alert alert-danger d-flex align-items-center" role="alert" aria-live="assertive"><i class="bi bi-exclamation-triangle-fill"></i><span><?= htmlspecialchars($error) ?></span></div><?php endif; ?>
-  <?php if (!empty($debug)): ?><div class="alert alert-info"><strong>Debug:</strong><br><?= implode('<br>', array_map('htmlspecialchars', $debug)) ?></div><?php endif; ?>
-  <form method="post" action="login.php">
-    <div class="mb-3">
-      <label for="email" class="form-label text-dark">Email</label>
-      <input type="email" class="form-control" id="email" name="email" value="" required>
+<?php if ($error): ?>
+  <div class="alert alert-danger" role="alert" aria-live="assertive">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <span><?= htmlspecialchars($error) ?></span>
+  </div>
+<?php endif; ?>
+<?php if (!empty($debug)): ?>
+  <div class="alert alert-info">
+    <strong>Debug:</strong><br><?= implode('<br>', array_map('htmlspecialchars', $debug)) ?>
+  </div>
+<?php endif; ?>
+
+<form method="post" action="login.php" autocomplete="on">
+  <div class="mb-4">
+    <label for="email" class="form-label">Email address</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+  </div>
+  <div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-1">
+      <label for="password" class="form-label mb-0">Password</label>
     </div>
-    <div class="mb-3">
-      <label for="password" class="form-label text-dark">Password</label>
-      <input type="password" class="form-control" id="password" name="password" value="" required>
+    <div class="input-with-toggle">
+      <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
+      <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show/hide password">
+        <i class="bi bi-eye" id="pwToggleIcon"></i>
+      </button>
     </div>
-    <div class="d-flex justify-content-between align-items-center mt-3">
-      <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2"><i class="bi bi-door-open"></i> Login</button>
-      <a href="<?= htmlspecialchars(app_href('register.php')) ?>" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><i class="bi bi-person-plus"></i> Register</a>
-    </div>
-  </form>
+  </div>
+  <div class="d-grid mb-3">
+    <button type="submit" class="btn btn-primary" style="padding:11px;">
+      <i class="bi bi-box-arrow-in-right"></i> Sign in
+    </button>
+  </div>
+  <p class="text-center mb-0" style="font-size:13px;color:var(--muted);">
+    Don't have an account?
+    <a href="<?= htmlspecialchars(app_href('register.php')) ?>" class="fw-semibold">Create one</a>
+  </p>
+</form>
+
+<script>
+(function(){
+  var btn = document.getElementById('pwToggle');
+  var inp = document.getElementById('password');
+  var ico = document.getElementById('pwToggleIcon');
+  if (btn && inp && ico) {
+    btn.addEventListener('click', function() {
+      var shown = inp.type === 'text';
+      inp.type = shown ? 'password' : 'text';
+      ico.className = shown ? 'bi bi-eye' : 'bi bi-eye-slash';
+    });
+  }
+})();
+</script>
 <?php render_auth_shell_end(); ?>

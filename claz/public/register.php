@@ -72,88 +72,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <?php render_auth_shell_start('Create your account', 'Join your class, practice past papers and track your scores.'); ?>
-<div class="mb-4">
-  <h1 class="h3 fw-semibold text-dark mb-1 d-flex align-items-center gap-2"><i class="bi bi-person-plus-fill text-primary"></i> Create an account</h1>
-  <p class="text-muted mb-0">Sign up as a student or teacher to get started.</p>
-</div>
-<div class="d-flex flex-wrap gap-2 mb-4">
-  <span class="badge-chip badge-chip-student"><i class="bi bi-emoji-smile"></i> Students: select your subjects and teachers</span>
-  <span class="badge-chip badge-chip-teacher"><i class="bi bi-person-video3"></i> Teachers: supply your code</span>
-  <span class="badge-chip badge-chip-security"><i class="bi bi-shield-check"></i> All accounts: secure password</span>
-</div>
-  <?php if ($error): ?>
-    <div class="alert alert-danger d-flex align-items-center" role="alert" aria-live="assertive">
-      <i class="bi bi-exclamation-triangle-fill"></i>
-      <span class="ms-2"><?= htmlspecialchars($error) ?></span>
-    </div>
-    <?php if (!empty($debug_mode)): ?>
-      <div class="alert alert-warning" role="alert"><strong>Debug info:</strong> Please ensure MySQL is running and tables exist. Check `subjects` list via <code>api/subjects.php</code>.</div>
-    <?php endif; ?>
-  <?php endif; ?>
-  <?php if ($success): ?>
-    <div class="alert alert-success d-flex align-items-center" role="status" aria-live="polite">
-      <i class="bi bi-check-circle-fill"></i>
-      <span class="ms-2"><?= htmlspecialchars($success) ?></span>
-    </div>
-  <?php endif; ?>
-  <form method="post" class="needs-validation" novalidate>
-    <?= csrf_field(); ?>
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label for="name" class="form-label text-dark">Name</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-person"></i></span>
-          <input name="name" id="name" class="form-control" required>
-          <div class="invalid-feedback">Name required.</div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <label for="reg_email" class="form-label text-dark">Email</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-          <input type="email" name="email" id="reg_email" class="form-control" required>
-          <div class="invalid-feedback">Valid email required.</div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <label for="password" class="form-label text-dark">Password</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-lock"></i></span>
-          <input type="password" name="password" id="password" class="form-control" autocomplete="new-password" required>
-          <div class="invalid-feedback">Password required.</div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <label for="user_type" class="form-label text-dark">User Type</label>
-        <select name="user_type" id="user_type" class="form-select" onchange="toggleFields()">
-          <option value="student">Student</option>
-          <option value="teacher">Teacher</option>
-        </select>
-      </div>
-    </div>
-    <!-- Student fields removed: students can manage their subjects/teachers from their profile -->
 
-    <div id="teacher_fields" class="mt-4" style="display:none;">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-light d-flex align-items-center gap-2">
+<?php if ($error): ?>
+  <div class="alert alert-danger" role="alert" aria-live="assertive">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <span><?= htmlspecialchars($error) ?></span>
+  </div>
+<?php endif; ?>
+<?php if ($success): ?>
+  <div class="alert alert-success" role="status" aria-live="polite">
+    <i class="bi bi-check-circle-fill"></i>
+    <span><?= $success ?></span>
+  </div>
+<?php endif; ?>
+
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <span class="badge-chip badge-chip-student"><i class="bi bi-emoji-smile"></i> Students</span>
+  <span class="badge-chip badge-chip-teacher"><i class="bi bi-person-video3"></i> Teachers</span>
+  <span class="badge-chip badge-chip-security"><i class="bi bi-shield-check"></i> Secure</span>
+</div>
+
+<form method="post" class="needs-validation" novalidate>
+  <?= csrf_field(); ?>
+  <div class="row g-3 mb-3">
+    <div class="col-12">
+      <label for="name" class="form-label">Full Name</label>
+      <input name="name" id="name" class="form-control" placeholder="Your full name" required>
+      <div class="invalid-feedback">Name required.</div>
+    </div>
+    <div class="col-12">
+      <label for="reg_email" class="form-label">Email address</label>
+      <input type="email" name="email" id="reg_email" class="form-control" placeholder="you@example.com" required>
+      <div class="invalid-feedback">Valid email required.</div>
+    </div>
+    <div class="col-12">
+      <label for="password" class="form-label">Password</label>
+      <div class="input-with-toggle">
+        <input type="password" name="password" id="password" class="form-control" placeholder="Create a password" autocomplete="new-password" required>
+        <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show/hide password">
+          <i class="bi bi-eye" id="pwToggleIcon"></i>
+        </button>
+      </div>
+      <div class="invalid-feedback">Password required.</div>
+    </div>
+    <div class="col-12">
+      <label for="user_type" class="form-label">I am a</label>
+      <select name="user_type" id="user_type" class="form-select" onchange="toggleFields()">
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="teacher_fields" style="display:none;">
+    <div class="app-card mb-3">
+      <div class="app-card-header">
+        <h3 class="app-card-title">
           <i class="bi bi-journal-bookmark text-primary"></i>
-          <span class="fw-semibold">Subjects You Teach</span>
-        </div>
-        <div class="card-body">
-          <p class="text-muted small mb-3">Your teacher code will be auto-generated after registration.</p>
-          
-          <label class="form-label">Select Subjects</label>
-          <div id="teacher_subject_list" class="d-flex flex-column gap-2 mb-3"></div>
-          <div class="form-text">Select one or more subjects you teach. This helps students find you.</div>
-        </div>
+          Subjects You Teach
+        </h3>
+      </div>
+      <div class="app-card-body">
+        <p class="mb-3" style="font-size:12.5px;color:var(--muted);">Your unique teacher code will be generated automatically after registration.</p>
+        <label class="form-label">Select Subjects</label>
+        <div id="teacher_subject_list" class="d-flex flex-column gap-2 mb-2"></div>
+        <div class="form-text">Select one or more subjects. Students will find you by these.</div>
       </div>
     </div>
-    <div class="d-flex gap-2 flex-wrap mt-4">
-      <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2"><i class="bi bi-person-check"></i> Register</button>
-      <a href="<?= htmlspecialchars(app_href('login.php')) ?>" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><i class="bi bi-arrow-left"></i> Back to Login</a>
-    </div>
-  </form>
-<p class="consent-note small mt-3 mb-0"><i class="bi bi-stars"></i> By creating an account you agree to our colorful classroom rules.</p>
+  </div>
+
+  <div class="d-grid mb-3">
+    <button type="submit" class="btn btn-primary" style="padding:11px;">
+      <i class="bi bi-person-check"></i> Create Account
+    </button>
+  </div>
+  <p class="text-center mb-3" style="font-size:13px;color:var(--muted);">
+    Already have an account?
+    <a href="<?= htmlspecialchars(app_href('login.php')) ?>" class="fw-semibold">Sign in</a>
+  </p>
+  <p class="consent-note small mb-0"><i class="bi bi-stars"></i> By creating an account you agree to our colorful classroom rules.</p>
+</form>
 <script>
 function setSectionDisabled(sectionId, disabled){
   const section = document.getElementById(sectionId);
