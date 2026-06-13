@@ -53,7 +53,6 @@ $draftCount = count($papers) - $publishedCount;
 render_header('Manage Papers');
 ?>
 
-<?php render_welcome_banner($user); ?>
 <?php foreach ($errors as $e): ?>
   <div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i><?= htmlspecialchars($e) ?></div>
 <?php endforeach; ?>

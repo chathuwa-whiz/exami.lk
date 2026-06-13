@@ -26,8 +26,6 @@ $title = $isStudent ? 'Student Dashboard' : 'Dashboard';
 render_header($title, [], $user);
 ?>
 
-<?php render_welcome_banner($user); ?>
-
 <?php
 // Fetch teachers
 try {

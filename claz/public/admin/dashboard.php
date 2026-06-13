@@ -21,8 +21,6 @@ $recentLogs = $pdo->query('SELECT user_id, action, details, created_at FROM audi
 render_header('Admin Dashboard');
 ?>
 
-<?php render_welcome_banner($user); ?>
-
 <!-- Stat Cards -->
 <div class="stat-cards">
   <div class="stat-card">

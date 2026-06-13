@@ -6,7 +6,7 @@ require_login();
 $user = current_user();
 if ($user['user_type'] !== 'admin') { http_response_code(403); echo 'Forbidden'; exit; }
 $pdo = db();
-$errors = [];$success='';$report=[];
+$errors = []; $success = ''; $report = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (!csrf_verify()) { $errors[] = 'Bad CSRF'; }
   elseif (!isset($_FILES['csv']) || $_FILES['csv']['error'] !== UPLOAD_ERR_OK) { $errors[] = 'Upload failed'; }
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           }
           fclose($fh);
           $pdo->commit();
-          $success='Import processed.';
+          $success='Import processed successfully.';
         } catch(Exception $e){ $pdo->rollBack(); $errors[]='Import error: '.$e->getMessage(); }
       }
     }
@@ -62,91 +62,105 @@ $hasHeader = $_SERVER['REQUEST_METHOD'] !== 'POST' ? true : isset($_POST['has_he
 $reportCount = count($report);
 render_header('Bulk Import');
 ?>
-<section class="mb-4">
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="app-card p-4 h-100">
-        <p class="text-uppercase small text-muted mb-1">Max file size</p>
-        <h3 class="mb-0">2 MB</h3>
-        <p class="muted small mb-0">CSV only</p>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="app-card p-4 h-100">
-        <p class="text-uppercase small text-muted mb-1">Header row</p>
-        <h3 class="mb-0"><?= $hasHeader ? 'Skipped' : 'Included' ?></h3>
-        <p class="muted small mb-0">Toggle before uploading</p>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="app-card p-4 h-100">
-        <p class="text-uppercase small text-muted mb-1">Latest run</p>
-        <h3 class="mb-0"><?= $reportCount ?> entries</h3>
-        <p class="muted small mb-0">Only updates after upload</p>
-      </div>
+
+<div class="stat-cards">
+  <div class="stat-card">
+    <div class="stat-card-icon blue"><i class="bi bi-cloud-upload"></i></div>
+    <div>
+      <p class="stat-card-label">Max File Size</p>
+      <p class="stat-card-value">2 MB</p>
+      <p class="stat-card-sub">CSV files only</p>
     </div>
   </div>
-</section>
+  <div class="stat-card">
+    <div class="stat-card-icon gray"><i class="bi bi-table"></i></div>
+    <div>
+      <p class="stat-card-label">Header Row</p>
+      <p class="stat-card-value"><?= $hasHeader ? 'Skipped' : 'Included' ?></p>
+      <p class="stat-card-sub">Toggle before uploading</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-icon <?= $reportCount > 0 ? 'yellow' : 'gray' ?>"><i class="bi bi-lightning<?= $reportCount > 0 ? '-fill' : '' ?>"></i></div>
+    <div>
+      <p class="stat-card-label">Latest Run</p>
+      <p class="stat-card-value"><?= $reportCount ?></p>
+      <p class="stat-card-sub">Lines processed</p>
+    </div>
+  </div>
+</div>
 
 <?php foreach ($errors as $e): ?>
-  <div class="alert alert-danger" role="alert" aria-live="assertive"><?= htmlspecialchars($e) ?></div>
+  <div class="alert alert-danger" role="alert" aria-live="assertive"><i class="bi bi-exclamation-triangle-fill me-1"></i><?= htmlspecialchars($e) ?></div>
 <?php endforeach; ?>
 <?php if ($success): ?>
-  <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($success) ?></div>
+  <div class="alert alert-success" role="status" aria-live="polite"><i class="bi bi-check-circle-fill me-1"></i><?= htmlspecialchars($success) ?></div>
 <?php endif; ?>
 
-<section class="app-card p-4 mb-4">
-  <div class="d-flex justify-content-between flex-wrap gap-2 align-items-center mb-3">
-    <div>
-      <h2 class="h5 mb-1">Import preapproved students</h2>
-      <p class="muted small mb-0">Upload a CSV to add students and link teachers in bulk.</p>
-    </div>
-    <a class="btn btn-outline-secondary btn-sm" href="<?= htmlspecialchars(app_href('admin/index.php')) ?>">Back to dashboard</a>
+<div class="app-card mb-4">
+  <div class="app-card-header">
+    <h2 class="app-card-title"><i class="bi bi-upload text-primary"></i> Import Preapproved Students</h2>
+    <a class="btn btn-outline-secondary btn-sm" href="<?= htmlspecialchars(app_href('admin/index.php')) ?>"><i class="bi bi-arrow-left"></i> Back to Students</a>
   </div>
-  <form method="post" enctype="multipart/form-data" class="row g-3" aria-label="Import students CSV">
-    <?= csrf_field(); ?>
-    <div class="col-12 col-md-6">
-      <label class="form-label small text-uppercase" for="csv">CSV file</label>
-      <input type="file" class="form-control" id="csv" name="csv" accept=".csv" required>
-    </div>
-    <div class="col-12 col-md-6 d-flex align-items-center">
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="1" id="has_header" name="has_header" <?= $hasHeader ? 'checked' : '' ?>>
-        <label class="form-check-label" for="has_header">First row contains headers</label>
+  <div class="app-card-body">
+    <p style="font-size:13px;color:var(--on-surface-muted);margin-bottom:1.25rem;">Upload a CSV to add students and link teachers in bulk.</p>
+    <form method="post" enctype="multipart/form-data" class="row g-3" aria-label="Import students CSV">
+      <?= csrf_field(); ?>
+      <div class="col-12 col-md-6">
+        <label class="form-label" for="csv">CSV File</label>
+        <input type="file" class="form-control" id="csv" name="csv" accept=".csv" required>
       </div>
-    </div>
-    <div class="col-12 d-flex flex-wrap gap-2">
-      <button type="submit" class="btn btn-primary">Run import</button>
-      <a href="<?= htmlspecialchars(app_href('admin/index.php')) ?>" class="btn btn-outline-secondary">Cancel</a>
-    </div>
-  </form>
-</section>
+      <div class="col-12 col-md-6 d-flex align-items-end">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="1" id="has_header" name="has_header" <?= $hasHeader ? 'checked' : '' ?>>
+          <label class="form-check-label" for="has_header">First row contains headers (skip it)</label>
+        </div>
+      </div>
+      <div class="col-12 d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2"><i class="bi bi-upload"></i> Run Import</button>
+        <a href="<?= htmlspecialchars(app_href('admin/index.php')) ?>" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
 
-<section class="row g-4">
+<div class="row g-4">
   <div class="col-lg-6">
-    <div class="app-card p-4 h-100">
-      <h3 class="h6 text-uppercase text-muted mb-3">CSV format</h3>
-      <p class="muted small">Columns: <code>student_id</code>, <code>name</code>, <code>teacher_ids</code> (semicolon separated).</p>
-      <pre class="code mb-0">student_id,name,teacher_ids
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <h2 class="app-card-title"><i class="bi bi-filetype-csv"></i> CSV Format</h2>
+      </div>
+      <div class="app-card-body">
+        <p style="font-size:13px;color:var(--on-surface-muted);margin-bottom:.75rem;">Three columns: <code>student_id</code>, <code>name</code>, <code>teacher_ids</code> (semicolon-separated teacher IDs).</p>
+        <pre style="background:var(--surface-subtle);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-size:12.5px;margin:0;overflow-x:auto;">student_id,name,teacher_ids
 25C18379,Student One,12;15
 25C18380,Student Two,12</pre>
+      </div>
     </div>
   </div>
   <div class="col-lg-6">
-    <div class="app-card p-4 h-100">
-      <h3 class="h6 text-uppercase text-muted mb-3">Latest report</h3>
-      <?php if ($report): ?>
-        <ol class="mb-0 small d-flex flex-column gap-2">
-          <?php foreach ($report as $r): ?>
-            <li class="border rounded-4 px-3 py-2 bg-body-secondary-subtle">
-              <?= htmlspecialchars($r) ?>
-            </li>
-          <?php endforeach; ?>
-        </ol>
-      <?php else: ?>
-        <p class="muted mb-0">Upload a CSV to view a processing report.</p>
-      <?php endif; ?>
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <h2 class="app-card-title"><i class="bi bi-list-check"></i> Latest Report</h2>
+        <?php if ($reportCount > 0): ?>
+          <span class="badge-soft badge-soft-warning"><?= $reportCount ?> lines</span>
+        <?php endif; ?>
+      </div>
+      <div class="app-card-body">
+        <?php if ($report): ?>
+          <ol class="mb-0 small d-flex flex-column gap-2" style="padding-left:1.25rem;">
+            <?php foreach ($report as $r): ?>
+              <li style="padding:.4rem .75rem;background:var(--surface-subtle);border-radius:var(--radius-sm);border:1px solid var(--border);">
+                <?= htmlspecialchars($r) ?>
+              </li>
+            <?php endforeach; ?>
+          </ol>
+        <?php else: ?>
+          <p style="color:var(--on-surface-muted);font-size:13px;margin:0;">Upload a CSV to view a processing report here.</p>
+        <?php endif; ?>
+      </div>
     </div>
   </div>
-</section>
+</div>
+
 <?php render_footer(); ?>

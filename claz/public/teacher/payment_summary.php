@@ -12,9 +12,8 @@ if ($user['user_type'] !== 'teacher') {
 
 $pdo = db();
 
-// Aggregate payments for this teacher's papers
 $summaryStmt = $pdo->prepare('
-  SELECT 
+  SELECT
     COALESCE(SUM(p.amount_cents), 0) AS total_collected_cents,
     COUNT(*) AS total_payments,
     COALESCE(SUM(CASE WHEN p.status = "completed" THEN p.amount_cents ELSE 0 END), 0) AS completed_cents
@@ -30,7 +29,6 @@ $totalPayments = (int)($summary['total_payments'] ?? 0);
 $completedCollected = ($summary['completed_cents'] ?? 0) / 100;
 $teacherShare = $completedCollected * 0.80;
 
-// Total paid out
 $payoutStmt = $pdo->prepare('SELECT COALESCE(SUM(amount_cents), 0) AS total_paid_cents FROM payout_requests WHERE teacher_id = ? AND status IN ("approved", "completed")');
 $payoutStmt->execute([$user['id']]);
 $payoutStats = $payoutStmt->fetch();
@@ -38,7 +36,6 @@ $totalPaidOut = ($payoutStats['total_paid_cents'] ?? 0) / 100;
 
 $availableBalance = $teacherShare - $totalPaidOut;
 
-// Recent payments
 $paymentsStmt = $pdo->prepare('
     SELECT p.id, p.order_id, p.transaction_id, p.amount_cents, p.status, p.paid_at, p.created_at, pa.title
     FROM payments p
@@ -53,79 +50,79 @@ $payments = $paymentsStmt->fetchAll();
 render_header('Payment Summary');
 ?>
 
-<div class="mb-4">
-  <a href="<?= htmlspecialchars(app_href('teacher/payouts.php')) ?>" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left"></i> Back to Payouts
-  </a>
-</div>
-
-<div class="row g-4 mb-4">
-  <div class="col-md-4">
-    <div class="app-card p-4 shadow-sm" style="border-top: 4px solid #6759ff;">
-      <p class="text-muted small mb-2">Gross Collected</p>
-      <h2 class="mb-0" style="color: #6759ff; font-weight: 700;">Rs. <?= number_format($totalCollected, 2) ?></h2>
-      <p class="text-muted small mt-2 mb-0">All payments (any status)</p>
+<div class="stat-cards">
+  <div class="stat-card">
+    <div class="stat-card-icon blue"><i class="bi bi-cash-stack"></i></div>
+    <div>
+      <p class="stat-card-label">Gross Collected</p>
+      <p class="stat-card-value">Rs. <?= number_format($totalCollected, 2) ?></p>
+      <p class="stat-card-sub">All payments (any status)</p>
     </div>
   </div>
-  <div class="col-md-4">
-    <div class="app-card p-4 shadow-sm" style="border-top: 4px solid #14b8a6;">
-      <p class="text-muted small mb-2">Your Share (80%)</p>
-      <h2 class="mb-0" style="color: #14b8a6; font-weight: 700;">Rs. <?= number_format($teacherShare, 2) ?></h2>
-      <p class="text-muted small mt-2 mb-0">Based on completed payments</p>
+  <div class="stat-card">
+    <div class="stat-card-icon green"><i class="bi bi-pie-chart"></i></div>
+    <div>
+      <p class="stat-card-label">Your Share (80%)</p>
+      <p class="stat-card-value">Rs. <?= number_format($teacherShare, 2) ?></p>
+      <p class="stat-card-sub">Based on completed payments</p>
     </div>
   </div>
-  <div class="col-md-4">
-    <div class="app-card p-4 shadow-sm" style="border-top: 4px solid #f59e0b;">
-      <p class="text-muted small mb-2">Available Balance</p>
-      <h2 class="mb-0" style="color: #f59e0b; font-weight: 700;">Rs. <?= number_format($availableBalance, 2) ?></h2>
-      <p class="text-muted small mt-2 mb-0">After payouts</p>
+  <div class="stat-card">
+    <div class="stat-card-icon yellow"><i class="bi bi-wallet2"></i></div>
+    <div>
+      <p class="stat-card-label">Available Balance</p>
+      <p class="stat-card-value">Rs. <?= number_format($availableBalance, 2) ?></p>
+      <p class="stat-card-sub">After payouts</p>
     </div>
   </div>
 </div>
 
-<div class="app-card p-4 shadow-sm">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="h5 mb-0 d-flex align-items-center gap-2"><i class="bi bi-receipt text-primary"></i> Recent Payments</h3>
-    <span class="text-muted small">Showing latest 20</span>
+<div class="app-card">
+  <div class="app-card-header">
+    <h2 class="app-card-title"><i class="bi bi-receipt text-primary"></i> Recent Payments</h2>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge-soft badge-soft-gray">Latest <?= min($totalPayments, 20) ?></span>
+      <a href="<?= htmlspecialchars(app_href('teacher/payouts.php')) ?>" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Payouts</a>
+    </div>
   </div>
   <?php if (empty($payments)): ?>
-    <div class="alert alert-info mb-0">No payments recorded yet.</div>
+    <div class="app-card-body">
+      <div class="text-center py-4">
+        <i class="bi bi-inbox" style="font-size:2rem;color:var(--muted-light);display:block;margin-bottom:10px;"></i>
+        <p style="color:var(--on-surface-muted);">No payments recorded yet.</p>
+      </div>
+    </div>
   <?php else: ?>
-    <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead>
-          <tr>
-            <th>Order</th>
-            <th>Paper</th>
-            <th>Status</th>
-            <th>Amount</th>
-            <th>Paid At</th>
-            <th>Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($payments as $p): ?>
+    <div class="app-card-body p-0">
+      <div class="data-table table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
             <tr>
-              <td><code><?= htmlspecialchars($p['order_id']) ?></code></td>
-              <td><?= htmlspecialchars($p['title']) ?></td>
-              <td>
-                <?php
-                  $status = $p['status'];
-                  $badge = [
-                    'completed' => 'success',
-                    'pending'   => 'warning',
-                    'failed'    => 'danger',
-                  ][$status] ?? 'secondary';
-                ?>
-                <span class="badge bg-<?= $badge ?> text-capitalize"><?= htmlspecialchars($status) ?></span>
-              </td>
-              <td><strong>Rs. <?= number_format($p['amount_cents'] / 100, 2) ?></strong></td>
-              <td><?= $p['paid_at'] ? date('Y-m-d H:i', strtotime($p['paid_at'])) : '-' ?></td>
-              <td><?= date('Y-m-d H:i', strtotime($p['created_at'])) ?></td>
+              <th>Order</th>
+              <th>Paper</th>
+              <th>Status</th>
+              <th>Amount</th>
+              <th>Paid At</th>
+              <th>Created</th>
             </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <?php foreach ($payments as $p):
+              $statusMap = ['completed' => 'success', 'pending' => 'warning', 'failed' => 'danger'];
+              $badge = $statusMap[$p['status']] ?? 'gray';
+            ?>
+              <tr>
+                <td><code style="font-size:12px;background:var(--surface-subtle);padding:2px 6px;border-radius:4px;"><?= htmlspecialchars($p['order_id']) ?></code></td>
+                <td><?= htmlspecialchars($p['title']) ?></td>
+                <td><span class="badge-soft badge-soft-<?= $badge ?>"><?= htmlspecialchars($p['status']) ?></span></td>
+                <td><strong>Rs. <?= number_format($p['amount_cents'] / 100, 2) ?></strong></td>
+                <td style="font-size:13px;color:var(--on-surface-muted);"><?= $p['paid_at'] ? date('Y-m-d H:i', strtotime($p['paid_at'])) : '<span style="color:var(--muted-light);">—</span>' ?></td>
+                <td style="font-size:13px;color:var(--on-surface-muted);"><?= date('Y-m-d H:i', strtotime($p['created_at'])) ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
     </div>
   <?php endif; ?>
 </div>
